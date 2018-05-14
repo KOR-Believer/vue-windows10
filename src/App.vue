@@ -98,7 +98,7 @@ body {
     box-sizing:border-box;
     color: rgb(159,159,159);
     font-size: 15px;
-    line-height: 38px;
+    line-height: 40px;
     flex:none;
     letter-spacing: 0.01em;
 }
@@ -244,7 +244,7 @@ body {
     width: 80px;
     padding-top:1px;
     box-sizing:border-box;
-    line-height: 18px;
+    line-height: 20px;
 }
 
 .task-bottom .clock-area div:nth-of-type(2) {
@@ -301,7 +301,7 @@ body {
     width: 80px;
     padding-top:1px;
     box-sizing:border-box;
-    line-height: 18px;
+    line-height: 20px;
 }
 .task-top .clock-area div:nth-of-type(2) {
     display: none;

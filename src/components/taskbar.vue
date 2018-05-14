@@ -11,7 +11,7 @@
     <div class="task">
 
     </div>
-    <div class="task-bar-drag" draggable="true"></div>
+    <div class="task-bar-drag" draggable="true" v-on:drag="drag()"></div>
     <div class="clock-area">
         <div v-text="currentTime"></div>
         <div v-text="currentDay"></div>
@@ -67,6 +67,9 @@ export default {
             this.currentTime = currentTime;
             this.currentDate = nowDate.getFullYear()+'-'+month+'-'+date;
             this.currentDay  = week[nowDate.getDay()] + '요일';
+        },
+        drag : function () {
+            console.log("dragged");
         }
     }
 }
