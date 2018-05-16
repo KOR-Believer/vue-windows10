@@ -12,27 +12,34 @@
         <taskbar></taskbar>
     </div>
 </template>
+
 <script>
 import notifybar from './components/notifybar.vue'
 import taskbar   from './components/taskbar.vue'
-import window    from './components/window.vue'
+import windows   from './components/windows.vue'
 export default {
-  components : {
-    'notifybar' : notifybar,
-    'taskbar' : taskbar,
-    'window' : window
-  }
+    mounted () {
+        this.$nextTick(function () {
+            window.addEventListener('resize', this.resizeWindow);
+        });
+    },
+    components: {
+        'notifybar': notifybar,
+        'taskbar': taskbar,
+        'windows': windows
+    },
+    methods: {
+      resizeWindow: function () {
+            this.$store.commit('screenRecalculation');
+        }
+   },
+   beforeDestroy () {
+       window.addEventListener('resize', this.resizeWindow);
+   }
 }
 </script>
 
 <style>
-
-/*
-    CSS 작성 요령.
-    포지션과 스타일링을 분리하자. -> 와장창 실패했다
-    각개별 분리된 CSS로 조합하여 사이트를 완성 -> 다음 포폴에는 제발..
-*/
-
 * {
     margin: 0;
     padding: 0;
@@ -877,5 +884,4 @@ body {
     background-position: center;
     background-repeat: no-repeat;
 }
-
 </style>
