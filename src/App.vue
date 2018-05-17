@@ -1,5 +1,5 @@
 <template>
-    <div id="wrap" class="task-bottom">
+    <div id="wrap" :class="'task-'+direction">
         <div class="desktop">
             <notifybar></notifybar>
 
@@ -7,6 +7,7 @@
             <div id="new-window2" style="background-color:blue; width:100px; height:100px;">APP 2</div>
             <div id="new-window3" style="background-color:blue; width:100px; height:100px;">APP 3</div>
             <div id="new-window4" style="background-color:blue; width:100px; height:100px;">APP 4</div>
+
         </div>
 
         <taskbar></taskbar>
@@ -18,23 +19,28 @@ import notifybar from './components/notifybar.vue'
 import taskbar   from './components/taskbar.vue'
 import windows   from './components/windows.vue'
 export default {
-    mounted () {
-        this.$nextTick(function () {
-            window.addEventListener('resize', this.resizeWindow);
-        });
-    },
     components: {
         'notifybar': notifybar,
         'taskbar': taskbar,
         'windows': windows
     },
+    mounted: function () {
+        this.$nextTick(function () {
+            window.addEventListener('resize', this.resizeWindow);
+        });
+    },
     methods: {
-      resizeWindow: function () {
+        resizeWindow: function () {
             this.$store.commit('screenRecalculation');
         }
    },
-   beforeDestroy () {
-       window.addEventListener('resize', this.resizeWindow);
+   computed: {
+       direction: function() {
+           return this.$store.getters.getTaskbarDirection;
+       }
+   },
+   beforeDestroy: function () {
+        window.addEventListener('resize', this.resizeWindow);
    }
 }
 </script>

@@ -11,7 +11,7 @@
     <div class="task">
 
     </div>
-    <div class="task-bar-drag" draggable="true" v-on:drag="drag()"></div>
+    <div class="task-bar-drag" draggable="true" v-on:drag="drag"></div>
     <div class="clock-area">
         <div v-text="currentTime"></div>
         <div v-text="currentDay"></div>
@@ -68,8 +68,39 @@ export default {
             this.currentDate = nowDate.getFullYear()+'-'+month+'-'+date;
             this.currentDay  = week[nowDate.getDay()] + '요일';
         },
-        drag : function () {
-            console.log("dragged");
+        drag : function (event) {
+            if (event.clientX != 0 && event.clientY != 0) {
+                this.$store.commit('setTaskbarDirection', {direction: this.getCardinalDirection(event.clientX, event.clientY)});
+            }
+        },
+        getCardinalDirection : function (posX, posY) {
+            var y1 = (this.getScreenHeight / this.getScreenWidth) * posX;                          // y = ax    graph[ / ]
+            var y2 = - (this.getScreenHeight / this.getScreenWidth) * posX + this.getScreenHeight; // y = -ax+b graph[ \ ]
+            var direction = 0;
+            if (y1 > posY)         // y > ax     graph[ */  ]
+                direction += 1100;
+            else                   // y <= ax    graph[  /* ]
+                direction += 11;
+            if (y2 > posY)         // y > -ax+b  graph[  \* ]
+                direction += 1001;
+            else                   // y <= -ax+b graph[ *\  ]
+                direction += 110;
+            if (direction) {
+                return {
+                    2101: 'top',
+                    1210: 'right',
+                    121 : 'bottom',
+                    1012: 'left'
+                }[direction]
+            }
+        }
+    },
+    computed: {
+        getScreenWidth() {
+            return this.$store.getters.getScreenWidth;
+        },
+        getScreenHeight() {
+            return this.$store.getters.getScreenHeight;
         }
     }
 }
