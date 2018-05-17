@@ -74,9 +74,9 @@ export default {
             }
         },
         getCardinalDirection : function (posX, posY) {
-            var y1 = (this.getScreenHeight / this.getScreenWidth) * posX;                          // y = ax    graph[ / ]
-            var y2 = - (this.getScreenHeight / this.getScreenWidth) * posX + this.getScreenHeight; // y = -ax+b graph[ \ ]
-            var direction = 0;
+            let y1 = (this.getScreenHeight / this.getScreenWidth) * posX;                          // y = ax    graph[ / ]
+            let y2 = - (this.getScreenHeight / this.getScreenWidth) * posX + this.getScreenHeight; // y = -ax+b graph[ \ ]
+            let direction = 0;
             if (y1 > posY)         // y > ax     graph[ */  ]
                 direction += 1100;
             else                   // y <= ax    graph[  /* ]
