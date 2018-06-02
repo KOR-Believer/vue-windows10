@@ -3,11 +3,12 @@
         <div class="desktop">
             <notifybar></notifybar>
 
-            <div id="new-window1" style="background-color:blue; width:100px; height:100px;">APP 1</div>
-            <div id="new-window2" style="background-color:blue; width:100px; height:100px;">APP 2</div>
-            <div id="new-window3" style="background-color:blue; width:100px; height:100px;">APP 3</div>
-            <div id="new-window4" style="background-color:blue; width:100px; height:100px;">APP 4</div>
+            <div id="new-window1" style="background-color:blue; width:100px; height:100px;" v-on:click="tryOpen(1)">APP 1</div>
+            <div id="new-window2" style="background-color:blue; width:100px; height:100px;" v-on:click="tryOpen(2)">APP 2</div>
+            <div id="new-window3" style="background-color:blue; width:100px; height:100px;" v-on:click="tryOpen(3)">APP 3</div>
+            <div id="new-window4" style="background-color:blue; width:100px; height:100px;" v-on:click="tryOpen(4)">APP 4</div>
 
+            <component v-for="openedWindow in getAllTaskList" :is="openedWindow.appData" :key="openedWindow.appId" :app-id="openedWindow.appId"></component>
         </div>
 
         <taskbar></taskbar>
@@ -21,25 +22,49 @@ import windows   from './components/windows.vue'
 export default {
     components: {
         'notifybar': notifybar,
-        'taskbar': taskbar,
-        'windows': windows
+        'taskbar': taskbar
     },
-    mounted: function () {
-        this.$nextTick(function () {
+    mounted: function() {
+        this.$nextTick(function() {
             window.addEventListener('resize', this.resizeWindow);
         });
     },
     methods: {
-        resizeWindow: function () {
+        resizeWindow: function() {
             this.$store.commit('screenRecalculation');
+        },
+        tryOpen: function(appId) {
+            if( this.getTaskByAppId(appId) ) {
+                let a = this.getTaskByAppId(appId);
+                //포커스 세팅 시도
+                //로딩중 일 시 무시
+            } else {
+                this.addTask(appId);
+                //임시 작업 객체 생성
+                //창 생성
+                //완료 시 임시 작업 객체 실객체로 치환
+            }
+            //console.log(this.getAllTaskList);
+
+        },
+        getTaskByAppId: function(appId) {
+            return this.getAllTaskList[appId];
+        },
+        addTask: function(appId) {
+            let vc = windows;
+            this.$store.commit('addTask', {appId: appId, appData: vc});
         }
    },
    computed: {
        direction: function() {
            return this.$store.getters.getTaskbarDirection;
+       },
+       getAllTaskList: function() {
+           //console.log("dd"+this.$store.getters.getAllTaskList[1]);
+           return this.$store.getters.getAllTaskList;
        }
    },
-   beforeDestroy: function () {
+   beforeDestroy: function() {
         window.addEventListener('resize', this.resizeWindow);
    }
 }
@@ -506,21 +531,21 @@ body {
         animation: window_open_vertical 0.2s;
     }
         .border-nw {
-            cursor: nw-resize;
+            cursor: nw-resize !important;
             flex: none;
             width: 8px;
             height: 100%;
            /*background-color: red;*/
         }
         .border-n {
-            cursor: n-resize;
+            cursor: n-resize !important;
             width: auto;
             height: 100%;
             flex: auto;
             /*background-color: yellow;*/
         }
         .border-ne {
-            cursor: ne-resize;
+            cursor: ne-resize !important;
             flex: none;
             width: 8px;
             height: 100%;
@@ -535,7 +560,7 @@ body {
         flex-direction: row;
     }
         .border-w {
-            cursor: w-resize;
+            cursor: w-resize !important;
             flex: none;
             width: 8px;
             height: auto;
@@ -754,22 +779,22 @@ body {
             }
 
             .window-overlay{
-                top: 38px;
-                left: 8px;
+                width: 100%;
+                height: 100%;
                 position: absolute;
                 background-color: red;
                 display: none;
             }
 
         .border-e {
-            cursor: e-resize;
+            cursor: e-resize !important;
             flex: none;
             width: 8px;
             height: auto;
             animation: window_open_horizontal 0.2s;
             /*background-color: yellow;*/
         }
-       .iframe-inner { border: 0; padding:0; margin: 0; height:100%; width:100%; display:block; position: absolute;}
+       .iframe-inner {background-color: blue; border: 0; padding:0; margin: 0; height:100%; width:100%; display:block; position: absolute;}
 
     .window-border-bottom {
         flex:none;
@@ -780,21 +805,21 @@ body {
         animation: window_open_vertical 0.2s;
     }
         .border-sw {
-            cursor: sw-resize;
+            cursor: sw-resize !important;
             flex: none;
             width: 8px;
             height: 100%;
             /*background-color: red;*/
         }
         .border-s {
-            cursor: s-resize;
+            cursor: s-resize !important;
             width: auto;
             height: 100%;
             flex: auto;
             /*background-color: yellow;*/
         }
         .border-se {
-            cursor: se-resize;
+            cursor: se-resize !important;
             flex: none;
             width: 8px;
             height: 100%;

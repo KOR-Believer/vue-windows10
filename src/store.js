@@ -16,9 +16,7 @@ export const store = new Vuex.Store({
 
         taskbarDirection: 'bottom',
 
-        taskList: {
-
-        }
+        taskList: { }
     },
     getters: {
         getScreenWidth: function (state) {
@@ -32,6 +30,9 @@ export const store = new Vuex.Store({
         },
         getTaskbarDirection: function (state) {
             return state.taskbarDirection;
+        },
+        getAllTaskList: function (state) {
+            return state.taskList;
         }
     },
     mutations: {
@@ -49,6 +50,9 @@ export const store = new Vuex.Store({
         },
         setTaskbarDirection: function (state, payload) {
             state.taskbarDirection = payload.direction;
+        },
+        addTask: function (state, payload) {
+            Vue.set(state.taskList, payload.appId, payload);
         }
     }
 });
