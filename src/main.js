@@ -1,6 +1,6 @@
 import 'babel-polyfill'
 import 'eligrey-classlist-js-polyfill'
-import 'setdragimage-ie'
+import './modifiedModules/setdragimage-ie'
 
 import Vue from 'vue'
 import App from './app.vue'
