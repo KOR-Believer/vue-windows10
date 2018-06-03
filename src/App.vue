@@ -65,7 +65,7 @@ export default {
        }
    },
    beforeDestroy: function() {
-        window.addEventListener('resize', this.resizeWindow);
+        window.removeEventListener('resize', this.resizeWindow);
    }
 }
 </script>
@@ -88,13 +88,10 @@ body {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-
     background-image: url('./assets/images/desktop/bg_normal.jpg');
     background-size: cover;
     background-position: center;
-
 }
-
 
 @keyframes button_out {
     0% { background-color: rgba(127,127,127,0.3);}
@@ -104,7 +101,6 @@ body {
     0% { background-color: rgba(127,127,127,0.3);}
     100% { background-color: rgba(127,127,127,0.3);}
 }
-
 
 [data-component="taskbar"] {
     z-index: 999999;
@@ -127,7 +123,6 @@ body {
     background-image: url('./assets/images/taskbar/start_op0_hover.png');
 }
 
-
 .search-bar {
     background-color: rgb(63,63,63);
     height: 100%;
@@ -140,7 +135,6 @@ body {
     flex:none;
     letter-spacing: 0.01em;
 }
-
 .search-btn {
     flex:none;
     background-image: url('./assets/images/taskbar/search.png');
@@ -175,7 +169,6 @@ body {
     animation: button_in 1s;
 }
 
-
 .task-bar-drag {
     height: 100%;
     width: 100%;
@@ -200,18 +193,15 @@ body {
     animation: button_out .2s;
 }
 
-
 .clock-area div {
     font-size:0.788em;
     color:#dddddd;
     text-align:center;
 }
 
-
 .clock-area:hover {
     animation: button_in 1s;
 }
-
 .show-desktop{
     flex:none;
     animation: button_out .2s;
@@ -219,7 +209,6 @@ body {
  .show-desktop:hover {
     animation: button_in 1s;
 }
-
 
 .taskbar-color {
     width:100%;
@@ -238,7 +227,6 @@ body {
 .taskbar-gaussian-bg {
     width:100vw;
     height:100vh;
-
     z-index:-1;
 /*      background-image: url('./assets/images/desktop/bg_gaussian55.jpg');
     background-position: center;
@@ -252,16 +240,13 @@ body {
     width: 100vw;
     flex-direction : row;
 }
-
 .task-bottom .start-btn{
     height: 100%;
     width: 48px;
 }
 .task-bottom .search-btn {
     width: 0;
-
 }
-
 .task-bottom .task{
     height: 100%;
     width: 48px;
@@ -272,7 +257,6 @@ body {
     width: 48px;
     margin-right: 2px;
 }
-
 .task-bottom .notify-btn{
     height: 100%;
     width: 40px;
@@ -284,21 +268,15 @@ body {
     box-sizing:border-box;
     line-height: 20px;
 }
-
 .task-bottom .clock-area div:nth-of-type(2) {
     display: none;
 }
-
 .task-bottom .show-desktop{
     height: 100%;
     width: 4px;
     border-left: 1px solid #8a8a8a;
     margin-left: 8px;
 }
-
-
-
-
 
 .task-top .taskbar {
     height: 40px;
@@ -318,7 +296,6 @@ body {
 .task-top .search-bar {
     display: none;
 }
-
 .task-top .task{
     height: 100%;
     width: 48px;
@@ -329,7 +306,6 @@ body {
     width: 48px;
     margin-right: 2px;
 }
-
 .task-top .notify-btn{
     height: 100%;
     width: 40px;
@@ -344,19 +320,12 @@ body {
 .task-top .clock-area div:nth-of-type(2) {
     display: none;
 }
-
 .task-top .show-desktop{
     height: 100%;
     width: 4px;
     border-left: 1px solid #8a8a8a;
     margin-left: 8px;
 }
-
-
-
-
-
-
 .task-left .taskbar {
     height: 100vh;
     width: 66px;
@@ -377,7 +346,6 @@ body {
 .task-left .search-bar {
     display: none;
 }
-
 .task-left .task{
     height: 46px;
     width: 100%;
@@ -386,7 +354,6 @@ body {
     height: 40px;
     width: 100%;
 }
-
 .task-left .notify-btn{
     height: 32px;
     width: 100%;
@@ -403,10 +370,6 @@ body {
     border-top: 1px solid #8a8a8a;
     margin-top: 8px;
 }
-
-
-
-
 .task-right .taskbar {
     height: 100vh;
     width: 66px;
@@ -434,7 +397,6 @@ body {
     height: 40px;
     width: 100%;
 }
-
 .task-right .notify-btn{
     height: 32px;
     width: 100%;
@@ -451,7 +413,6 @@ body {
     border-top: 1px solid #8a8a8a;
     margin-top: 8px;
 }
-
 
     @keyframes window_open_opacity {
         0%{opacity: 0;}
@@ -499,7 +460,6 @@ body {
         border: 0 !important;
     }
 
-
     .invisible .window-border-top {
         padding-top: 2%;
         transition: padding 0.2s;
@@ -521,7 +481,6 @@ body {
         transition: opacity 0.2s;
     }
 
-
     .window-border-top {
         flex:none;
         width: auto;
@@ -531,21 +490,21 @@ body {
         animation: window_open_vertical 0.2s;
     }
         .border-nw {
-            cursor: nw-resize !important;
+            cursor: nw-resize;
             flex: none;
             width: 8px;
             height: 100%;
            /*background-color: red;*/
         }
         .border-n {
-            cursor: n-resize !important;
+            cursor: n-resize;
             width: auto;
             height: 100%;
             flex: auto;
             /*background-color: yellow;*/
         }
         .border-ne {
-            cursor: ne-resize !important;
+            cursor: ne-resize;
             flex: none;
             width: 8px;
             height: 100%;
@@ -560,14 +519,13 @@ body {
         flex-direction: row;
     }
         .border-w {
-            cursor: w-resize !important;
+            cursor: w-resize;
             flex: none;
             width: 8px;
             height: auto;
             animation: window_open_horizontal 0.2s;
             /*background-color: yellow;*/
         }
-
         .window-frame {
             border: 1px solid rgba(0,0,0,0.2);
             -webkit-background-clip: padding-box; /* for Safari */
@@ -594,11 +552,9 @@ body {
                 flex:none;
                 background-color: white;
             }
-
             .maximize-window .title-bar {
                 height:23px;
             }
-
                 .title-bar-icon {
                     width: 16px;
                     height: 28px;
@@ -612,7 +568,6 @@ body {
                     height: 22px;
                     margin: 0;
                 }
-
                 .window-title {
                     flex-grow: 1;
                     flex-shrink: 1;
@@ -628,11 +583,9 @@ body {
                     font-size: 0.74em;
                     line-height: 27px;
                 }
-
                 .maximize-window .window-title {
                     line-height: 23px;
                 }
-
                 @keyframes maximize_out {
                     0% {background-color: #e5e5e5;}
                     100% { background-color: inherit; }
@@ -641,34 +594,47 @@ body {
                     0% {background-color: inherit;}
                     100% {background-color: #e5e5e5;}
                 }
-
-
                 .maximize-button {
                     width: 45px;
                     height: 29px;
                     margin-right: 1px;
                     flex: none;
-                    background-image: url('./assets/images/window/mx.png');
+                    background-image: url('./assets/images/window/maximize.png');
                     background-repeat: no-repeat;
                     background-position: center center;
                 }
-
                 .maximize-window .maximize-button {
                     height: 21px;
-                    background-image: url('./assets/images/window/mn.png');
+                    background-image: url('./assets/images/window/resize.png');
                 }
-
-
                 .maximize-button-out{
                     animation: maximize_out .2s;
                 }
                 .maximize-button:hover {
-                    /*background-image: url('./assets/images/window/mx.png');     */
                     animation : maximize_in .2s;
                     -webkit-animation-fill-mode: forwards;
                     animation-fill-mode: forwards;
                 }
-
+                .minimize-button {
+                    width: 45px;
+                    height: 29px;
+                    margin-right: 1px;
+                    flex: none;
+                    background-image: url('./assets/images/window/minimize.png');
+                    background-repeat: no-repeat;
+                    background-position: center center;
+                }
+                .maximize-window .minimize-button {
+                    height: 21px;
+                }
+                .minimize-button-out{
+                    animation: maximize_out .2s;
+                }
+                .minimize-button:hover {
+                    animation : maximize_in .2s;
+                    -webkit-animation-fill-mode: forwards;
+                    animation-fill-mode: forwards;
+                }
                 @keyframes close_out {
                     0% {background-color: #E81123;}
                     100% {background-color: inherit;}
@@ -677,33 +643,27 @@ body {
                     0% {background-color: inherit;}
                     100% {background-color: #E81123;}
                 }
-
-
                 .close-button {
                     width: 45px;
                     height: 29px;
                     flex: none;
-                    background-image: url('./assets/images/window/xblack2.png');
+                    background-image: url('./assets/images/window/xblack3.png');
                     background-repeat: no-repeat;
                     background-position: center center;
                 }
-
                 .maximize-window .close-button {
                     height: 21px;
                     margin-right: 2px;
                 }
-
                 .close-button-out{
                     animation: close_out .2s;
                 }
-
                 .close-button:hover {
                     background-image: url('./assets/images/window/xwhite.png');
                     animation : close_in .2s;
                     -webkit-animation-fill-mode: forwards;
                     animation-fill-mode: forwards;
                 }
-
             .univ .title-bar {
                 width:auto;
                 height:31px;
@@ -716,7 +676,6 @@ body {
             .maximize-window.univ .title-bar {
                 height:32px;
             }
-
             .univ .window-title {
                 padding-left: 12px;
             }
@@ -727,19 +686,40 @@ body {
                     width: 46px;
                     height: 31px;
                     flex: none;
-                    background-image: url('./assets/images/window/mx.png');
+                    background-image: url('./assets/images/window/minimize.png');
                     background-repeat: no-repeat;
                     background-position: center center;
                 }
                 .maximize-window.univ .maximize-button {
                     height: 32px;
-                    background-image: url('./assets/images/window/mn.png');
                 }
                 .univ .maximize-button-out{
                     animation: maximize_out 0s;
                 }
                 .univ .maximize-button:hover {
-                    /*background-image: url('./assets/images/window/mx.png');     */
+                    /*background-image: url('./assets/images/window/maximize.png');     */
+                    animation : maximize_in 0s;
+                    -webkit-animation-fill-mode: forwards;
+                    animation-fill-mode: forwards;
+                }
+
+                .univ .minimize-button {
+                    width: 46px;
+                    height: 31px;
+                    flex: none;
+                    background-image: url('./assets/images/window/maximize.png');
+                    background-repeat: no-repeat;
+                    background-position: center center;
+                }
+                .maximize-window.univ .minimize-button {
+                    height: 32px;
+                    background-image: url('./assets/images/window/resize.png');
+                }
+                .univ .minimize-button-out{
+                    animation: maximize_out 0s;
+                }
+                .univ .minimize-button:hover {
+                    /*background-image: url('./assets/images/window/maximize.png');     */
                     animation : maximize_in 0s;
                     -webkit-animation-fill-mode: forwards;
                     animation-fill-mode: forwards;
@@ -748,36 +728,31 @@ body {
                     width: 46px;
                     height: 31px;
                     flex: none;
-                    background-image: url('./assets/images/window/xblack2.png');
+                    background-image: url('./assets/images/window/xblack3.png');
                     background-repeat: no-repeat;
                     background-position: center center;
-                }
-                .close-button-out{
-                    animation: close_out 0s;
-                }
-                .close-button:hover {
-                    background-image: url('./assets/images/window/xwhite.png');
-                    animation : close_in 0s;
-                    -webkit-animation-fill-mode: forwards;
-                    animation-fill-mode: forwards;
                 }
                 .maximize-window.univ .close-button {
                     height: 32px;
                     margin-right: 0;
                 }
-
+                .univ .close-button-out{
+                    animation: close_out 0s;
+                }
+                .univ .close-button:hover {
+                    background-image: url('./assets/images/window/xwhite.png');
+                    animation : close_in 0s;
+                    -webkit-animation-fill-mode: forwards;
+                    animation-fill-mode: forwards;
+                }
             .main-panel {
                 position: relative;
                 overflow: hidden;
                 width: auto;
                 height: auto;
-
                 box-sizing:border-box;
-                /*border-top :1px solid #dadbdc;*/
                 flex: auto;
-
             }
-
             .window-overlay{
                 width: 100%;
                 height: 100%;
@@ -785,17 +760,23 @@ body {
                 background-color: red;
                 display: none;
             }
-
         .border-e {
-            cursor: e-resize !important;
+            cursor: e-resize;
             flex: none;
             width: 8px;
             height: auto;
             animation: window_open_horizontal 0.2s;
-            /*background-color: yellow;*/
         }
-       .iframe-inner {background-color: blue; border: 0; padding:0; margin: 0; height:100%; width:100%; display:block; position: absolute;}
-
+       .iframe-inner {
+           background-color: blue;
+           border: 0;
+           padding:0;
+           margin: 0;
+           height:100%;
+           width:100%;
+           display:block;
+           position: absolute;
+        }
     .window-border-bottom {
         flex:none;
         width: auto;
@@ -805,27 +786,23 @@ body {
         animation: window_open_vertical 0.2s;
     }
         .border-sw {
-            cursor: sw-resize !important;
+            cursor: sw-resize;
             flex: none;
             width: 8px;
             height: 100%;
-            /*background-color: red;*/
         }
         .border-s {
-            cursor: s-resize !important;
+            cursor: s-resize;
             width: auto;
             height: 100%;
             flex: auto;
-            /*background-color: yellow;*/
         }
         .border-se {
-            cursor: se-resize !important;
+            cursor: se-resize;
             flex: none;
             width: 8px;
             height: 100%;
-            /*background-color: red;*/
         }
-
 
 #wrap {
     width: inherit;
@@ -843,7 +820,6 @@ body {
 }
 .task-right {
     flex-direction: row;
-
 }
 .desktop {
     position: relative;
@@ -854,7 +830,6 @@ body {
     flex-direction: column;
 }
 .notifybar {
-
     position:absolute;
     right:-360px;
     z-index: 1000001;
@@ -865,7 +840,6 @@ body {
     transition: right .6s;
     transition-timing-function: cubic-bezier(.2,1.02,.31,.96);
 }
-
 .task-right .notifybar {
     position:fixed;
 }
@@ -881,7 +855,6 @@ body {
     width:100vw;
     height:100vh;
 }
-
 .notify-app{
     color:white;
     height: 56px;
