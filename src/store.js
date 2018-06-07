@@ -12,7 +12,7 @@ export const store = new Vuex.Store({
             || document.documentElement.clientHeight
             || document.body.clientHeight,
 
-        maxZIndexValue: 1,
+        maxZIndexValue: 0,
 
         taskbarDirection: 'bottom',
 
@@ -46,13 +46,16 @@ export const store = new Vuex.Store({
                 || document.body.clientHeight;
         },
         setMaxZIndex: function (state, payload) {
-            return state.maxZIndexValue++;
+            state.maxZIndexValue++;
         },
         setTaskbarDirection: function (state, payload) {
             state.taskbarDirection = payload.direction;
         },
         addTask: function (state, payload) {
             Vue.set(state.taskList, payload.appId, payload);
+        },
+        deleteTask: function (state, payload) {
+            Vue.delete(state.taskList, payload.appId);
         }
     }
 });

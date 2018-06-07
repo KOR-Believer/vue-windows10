@@ -5,12 +5,13 @@
     <div class="search-btn"></div>
 
     <div class="task-view"></div>
-    <div class="task">
+    <div class="task"
+        :class="{'task-focused': true}"
+        v-for="openedWindow in getAllTaskList"
+        :key="openedWindow.appId"
+        @click="tryOpen(openedWindow.appId)"
+    ></div>
 
-    </div>
-    <div class="task">
-
-    </div>
     <div class="task-bar-drag" draggable="true" v-on:drag="drag"></div>
     <div class="clock-area">
         <div v-text="currentTime"></div>
@@ -93,6 +94,17 @@ export default {
                     1012: 'left'
                 }[direction]
             }
+        },
+        tryOpen: function(appId) {
+            this.$parent.tryOpen(appId);
+        },
+        getParentMeta: function(appId){
+            this.$parent.$children.forEach(element => {
+                if (element.id == appId) {
+                    //console.log(element.windowStyle.width);
+                    return element.isFocused;
+                }
+            });
         }
     },
     computed: {
@@ -101,11 +113,337 @@ export default {
         },
         getScreenHeight() {
             return this.$store.getters.getScreenHeight;
+        },
+        getAllTaskList: function() {
+            return this.$store.getters.getAllTaskList;
         }
     }
 }
 </script>
 
 <style>
+    .task-bottom {
+        flex-direction: column;
+    }
+    .task-top {
+        flex-direction: column-reverse;
+    }
+    .task-left {
+        flex-direction: row-reverse;
+    }
+    .task-right {
+        flex-direction: row;
+    }
+</style>
 
+<style scoped>
+    @keyframes button_out {
+        0% { background-color: rgba(127,127,127,0.3);}
+        100% {background-color: rgba(0,0,0,0);}
+    }
+    @keyframes button_in {
+        0% { background-color: rgba(127,127,127,0.3);}
+        100% { background-color: rgba(127,127,127,0.3);}
+    }
+    [data-component="taskbar"] {
+        z-index: 999999;
+        flex:none;
+        color:white;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+    }
+    .start-btn {
+        flex:none;
+        background-image: url('../assets/images/taskbar/start_op0.png');
+        background-position: center center;
+        background-repeat: no-repeat;
+        animation: button_out .2s;
+    }
+    .start-btn:hover {
+        animation: button_in 1s;
+        background-image: url('../assets/images/taskbar/start_op0_hover.png');
+    }
+    .search-bar {
+        background-color: rgb(63,63,63);
+        height: 100%;
+        width: 344px;
+        padding: 0 9px;
+        box-sizing:border-box;
+        color: rgb(159,159,159);
+        font-size: 15px;
+        line-height: 40px;
+        flex:none;
+        letter-spacing: 0.01em;
+    }
+    .search-btn {
+        flex:none;
+        background-image: url('../assets/images/taskbar/search.png');
+        background-position: center center;
+        background-repeat: no-repeat;
+        animation: button_out .2s;
+    }
+    .search-btn:hover {
+        animation: button_in 1s;
+    }
+    .task-view {
+        flex:none;
+        animation: button_out .2s;
+        background-image: url('../assets/images/taskbar/task_view.png');
+        background-position: center center;
+        background-repeat: no-repeat;
+    }
+    .task-view:hover {
+        animation: button_in 1s;
+        background-image: url('../assets/images/taskbar/task_view_hover.png');
+        background-position: center center;
+        background-repeat: no-repeat;
+    }
+    .task {
+        flex:none;
+        animation: button_out .2s;
+    }
+    .task-focused {
+        background-color: #333;
+    }
+
+    .task:hover {
+        animation: button_in 1s;
+    }
+    .task-bar-drag {
+        height: 100%;
+        width: 100%;
+        flex-basis: auto;
+        flex-grow: 0;
+        flex-shrink: 1;
+    }
+    .notify-btn {
+        flex:none;
+        animation: button_out .2s;
+        background-image: url('../assets/images/taskbar/notify.png');
+        background-position: center center;
+        background-repeat: no-repeat;
+    }
+    .notify-btn:hover {
+        animation: button_in 1s;
+    }
+    .clock-area {
+        flex:none;
+        animation: button_out .2s;
+    }
+    .clock-area div {
+        font-size:0.788em;
+        color:#dddddd;
+        text-align:center;
+    }
+    .clock-area:hover {
+        animation: button_in 1s;
+    }
+    .show-desktop{
+        flex:none;
+        animation: button_out .2s;
+    }
+    .show-desktop:hover {
+        animation: button_in 1s;
+    }
+    .taskbar-color {
+        width:100%;
+        height:100%;
+        position:absolute;
+        top: 0;
+        left: 0;
+        z-index:-2;
+        background-color:#000000;
+        opacity: 0.84;
+        /*이 부분을 다시 주석하고 아래 주석을 해제하면 작업 표시줄 블러링이 구현됨.
+        다만 표시줄 아래로 투영되는 창은 블러링은 커녕 보이지도 않는다.
+        배경화면 이미지 용량만큼 트래픽이 파바박 늘어나는건 덤*/
+    }
+    .taskbar-gaussian-bg {
+        width:100vw;
+        height:100vh;
+        z-index:-1;
+    /*      background-image: url('../assets/images/desktop/bg_gaussian55.jpg');
+        background-position: center;
+        background-size: cover;
+        background-attachment: fixed;
+        opacity: 0.17;*/
+    }
+    .task-bottom .taskbar {
+        height: 40px;
+        width: 100vw;
+        flex-direction : row;
+    }
+    .task-bottom .start-btn{
+        height: 100%;
+        width: 48px;
+    }
+    .task-bottom .search-btn {
+        width: 0;
+    }
+    .task-bottom .task{
+        height: 100%;
+        width: 48px;
+        margin-right: 1px;
+    }
+    .task-bottom .task-view{
+        height: 100%;
+        width: 48px;
+        margin-right: 2px;
+    }
+    .task-bottom .notify-btn{
+        height: 100%;
+        width: 40px;
+    }
+    .task-bottom .clock-area {
+        height: 100%;
+        width: 80px;
+        padding-top:1px;
+        box-sizing:border-box;
+        line-height: 20px;
+    }
+    .task-bottom .clock-area div:nth-of-type(2) {
+        display: none;
+    }
+    .task-bottom .show-desktop{
+        height: 100%;
+        width: 4px;
+        border-left: 1px solid #8a8a8a;
+        margin-left: 8px;
+    }
+    .task-top .taskbar {
+        height: 40px;
+        width: 100vw;
+        top: 0;
+        flex-direction : row;
+    }
+    .task-top .start-btn{
+        height: 100%;
+        width: 48px;
+    }
+    .task-top .search-btn {
+        display: block;
+        height: 100%;
+        width: 48px;
+    }
+    .task-top .search-bar {
+        display: none;
+    }
+    .task-top .task{
+        height: 100%;
+        width: 48px;
+        margin-right: 1px;
+    }
+    .task-top .task-view{
+        height: 100%;
+        width: 48px;
+        margin-right: 2px;
+    }
+    .task-top .notify-btn{
+        height: 100%;
+        width: 40px;
+    }
+    .task-top .clock-area {
+        height: 100%;
+        width: 80px;
+        padding-top:1px;
+        box-sizing:border-box;
+        line-height: 20px;
+    }
+    .task-top .clock-area div:nth-of-type(2) {
+        display: none;
+    }
+    .task-top .show-desktop{
+        height: 100%;
+        width: 4px;
+        border-left: 1px solid #8a8a8a;
+        margin-left: 8px;
+    }
+    .task-left .taskbar {
+        height: 100vh;
+        width: 66px;
+        min-width: 62px;
+        left: 0;
+        flex-direction : column;
+    }
+    .task-left .start-btn{
+        height: 40px;
+        width: 100%;
+    }
+
+    .task-left .search-btn {
+        display: block;
+        height: 40px;
+        width: 100%;
+    }
+    .task-left .search-bar {
+        display: none;
+    }
+    .task-left .task{
+        height: 46px;
+        width: 100%;
+    }
+    .task-left .task-view{
+        height: 40px;
+        width: 100%;
+    }
+    .task-left .notify-btn{
+        height: 32px;
+        width: 100%;
+        margin: 0 auto;
+    }
+    .task-left .clock-area{
+        height: 51px;
+        width: 100%;
+        margin: 11px 0;
+    }
+    .task-left .show-desktop{
+        height: 4px;
+        width: 100%;
+        border-top: 1px solid #8a8a8a;
+        margin-top: 8px;
+    }
+    .task-right .taskbar {
+        height: 100vh;
+        width: 66px;
+        min-width: 62px;
+        right: 0;
+        flex-direction : column;
+    }
+    .task-right .start-btn{
+        height: 40px;
+        width: 100%;
+    }
+    .task-right .search-btn {
+        display: block;
+        height: 40px;
+        width: 100%;
+    }
+    .task-right .search-bar {
+        display: none;
+    }
+    .task-right .task{
+        height: 46px;
+        width: 100%;
+    }
+    .task-right .task-view{
+        height: 40px;
+        width: 100%;
+    }
+    .task-right .notify-btn{
+        height: 32px;
+        width: 100%;
+        margin: 0 auto;
+    }
+    .task-right .clock-area{
+        height: 51px;
+        width: 100%;
+        margin: 11px 0;
+    }
+    .task-right .show-desktop{
+        height: 4px;
+        width: 100%;
+        border-top: 1px solid #8a8a8a;
+        margin-top: 8px;
+    }
 </style>
