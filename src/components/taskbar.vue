@@ -5,14 +5,24 @@
     <div class="search-btn"></div>
 
     <div class="task-view"></div>
-    <div class="task"
-        :class="{'task-focused': true}"
-        v-for="openedWindow in getAllTaskList"
+    <div
+        class="task"
+        :task-app-id="openedWindow.appId"
+        :class="{'task-opened': true,'focused':openedWindow.focused}"
+        v-for="(openedWindow) in getSortedAllTaskList"
         :key="openedWindow.appId"
+        ref="'task'+openedWindow.appId"
         @click="tryOpen(openedWindow.appId)"
-    ></div>
+        @mouseover.once=";"
+    >
+    id:
+    {{openedWindow.appId}}
+    <hr>
+    </div>
 
-    <div class="task-bar-drag" draggable="true" v-on:drag="drag"></div>
+    <div class="task-bar-drag" @mousedown="dragStart">
+
+    </div>
     <div class="clock-area">
         <div v-text="currentTime"></div>
         <div v-text="currentDay"></div>
@@ -31,25 +41,43 @@
 export default {
     data () {
         return {
+            isDrag : false,
             currentTime : '',
             currentDay  : '',
-            currentDate : '',
-            task : {
-
-            }
+            currentDate : ''
         }
     },
     mounted : function() {
         setInterval(this.updateDateTime, 1000);
+        window.addEventListener('mouseup', this.dragEnd);
+        window.addEventListener('mousemove', this.drag);
+    },
+    beforeDestroy: function() {
+        window.removeEventListener('mouseup', this.dragEnd);
+        window.removeEventListener('mousemove', this.drag);
     },
     methods : {
+        dragStart: function() {
+            this.isDrag = true;
+        },
+        drag : function (event) {
+            if(this.isDrag){
+                if (event.clientX != 0 && event.clientY != 0) {
+                    this.$store.commit('setTaskbarDirection', {direction: this.getCardinalDirection(event.clientX, event.clientY)});
+                }
+            }
+        },
+        dragEnd: function() {
+            this.isDrag = false;
+            //this.getTaskPosition();
+        },
         updateDateTime () {
-            let nowDate = new Date();
-            let hour    = nowDate.getHours();
-            let minute  = nowDate.getMinutes();
-            let month   = nowDate.getMonth()+1;
-            let date    = nowDate.getDate();
-            let week    = ['일', '월', '화', '수', '목', '금', '토'];
+            let nowDate     = new Date();
+            let hour        = nowDate.getHours();
+            let minute      = nowDate.getMinutes();
+            let month       = nowDate.getMonth() + 1;
+            let date        = nowDate.getDate();
+            let week        = ['일', '월', '화', '수', '목', '금', '토'];
             let currentTime = '';
 
             if ( hour < 12 ) {
@@ -58,9 +86,11 @@ export default {
                 currentTime = '오후 ';
                 hour -= 12;
             }
+
             if ( minute < 10 ) {
                 minute = '0' + minute;
             }
+
             currentTime += (hour ? hour : 12) + ":" + minute;
             if ( month < 10 ) month = '0' + month;
             if ( date < 10 )  date  = '0' + date;
@@ -69,11 +99,7 @@ export default {
             this.currentDate = nowDate.getFullYear()+'-'+month+'-'+date;
             this.currentDay  = week[nowDate.getDay()] + '요일';
         },
-        drag : function (event) {
-            if (event.clientX != 0 && event.clientY != 0) {
-                this.$store.commit('setTaskbarDirection', {direction: this.getCardinalDirection(event.clientX, event.clientY)});
-            }
-        },
+
         getCardinalDirection : function (posX, posY) {
             let y1 = (this.getScreenHeight / this.getScreenWidth) * posX;                          // y = ax    graph[ / ]
             let y2 = - (this.getScreenHeight / this.getScreenWidth) * posX + this.getScreenHeight; // y = -ax+b graph[ \ ]
@@ -96,16 +122,30 @@ export default {
             }
         },
         tryOpen: function(appId) {
-            this.$parent.tryOpen(appId);
+            if( this.$parent.getTaskByAppId(appId) ) {
+                this.$parent.$refs.windowComp.forEach(element => {
+                    if (element.id == appId) {
+                        element.focused = true;
+                        element.tryOpen();
+                        return;
+                    }
+                });
+            } else {
+                this.$parent.addTask(appId);
+            }
         },
-        getParentMeta: function(appId){
-            this.$parent.$children.forEach(element => {
-                if (element.id == appId) {
-                    //console.log(element.windowStyle.width);
-                    return element.isFocused;
+
+        getWindowComp: function(appId) {
+            this.getParentWindowCompRefs.forEach(windowComp => {
+                if(windowComp.appId == appId) {
+
                 }
             });
+        },
+        getTaskPosition: function() {
+
         }
+
     },
     computed: {
         getScreenWidth() {
@@ -114,8 +154,15 @@ export default {
         getScreenHeight() {
             return this.$store.getters.getScreenHeight;
         },
-        getAllTaskList: function() {
-            return this.$store.getters.getAllTaskList;
+        getSortedAllTaskList() {
+            let o = Object.values(this.$store.getters.getAllTaskList);
+            o.sort(function(a,b){
+                return a.index - b.index
+            })
+            return o;
+        },
+        getParentWindowCompRefs() {
+            return this.$parent.$refs.windowComp;
         }
     }
 }
@@ -138,15 +185,15 @@ export default {
 
 <style scoped>
     @keyframes button_out {
-        0% { background-color: rgba(127,127,127,0.3);}
+        0% { background-color: rgba(255,255,255,0.1);}
         100% {background-color: rgba(0,0,0,0);}
     }
     @keyframes button_in {
-        0% { background-color: rgba(127,127,127,0.3);}
-        100% { background-color: rgba(127,127,127,0.3);}
+        0% { background-color: rgba(255,255,255,0.1);}
+        100% { background-color: rgba(255,255,255,0.1);}
     }
-    [data-component="taskbar"] {
-        z-index: 999999;
+    .taskbar {
+        z-index: 2147483647;
         flex:none;
         color:white;
         overflow: hidden;
@@ -161,7 +208,7 @@ export default {
         animation: button_out .2s;
     }
     .start-btn:hover {
-        animation: button_in 1s;
+        background-color: rgba(255,255,255,0.1);
         background-image: url('../assets/images/taskbar/start_op0_hover.png');
     }
     .search-bar {
@@ -184,7 +231,7 @@ export default {
         animation: button_out .2s;
     }
     .search-btn:hover {
-        animation: button_in 1s;
+        background-color: rgba(255,255,255,0.1);
     }
     .task-view {
         flex:none;
@@ -194,21 +241,35 @@ export default {
         background-repeat: no-repeat;
     }
     .task-view:hover {
-        animation: button_in 1s;
+        background-color: rgba(255,255,255,0.1);
         background-image: url('../assets/images/taskbar/task_view_hover.png');
         background-position: center center;
         background-repeat: no-repeat;
     }
     .task {
+        position: relative;
+        text-align:center;
         flex:none;
         animation: button_out .2s;
     }
-    .task-focused {
-        background-color: #333;
+    .task:hover {
+        /* background-color: rgba(255,255,255,0.1); */
+        background-color: rgba(255,255,255,0.1);
+    }
+    .task.focused {
+        background-color: rgba(255,255,255,0.2);
+    }
+    .task.focused:hover {
+        background-color: rgba(255,255,255,0.28);
     }
 
-    .task:hover {
-        animation: button_in 1s;
+    .task hr {
+        display: none;
+    }
+    .task-opened hr {
+        position: absolute;
+        display: block;
+        background-color: #adacf0;
     }
     .task-bar-drag {
         height: 100%;
@@ -225,26 +286,28 @@ export default {
         background-repeat: no-repeat;
     }
     .notify-btn:hover {
-        animation: button_in 1s;
+        background-color: rgba(255,255,255,0.1);
     }
     .clock-area {
         flex:none;
         animation: button_out .2s;
     }
     .clock-area div {
-        font-size:0.788em;
+        /* font-size:0.788em; */
+        font-size:0.8em;
+
         color:#dddddd;
         text-align:center;
     }
     .clock-area:hover {
-        animation: button_in 1s;
+        background-color: rgba(255,255,255,0.1);
     }
     .show-desktop{
         flex:none;
         animation: button_out .2s;
     }
     .show-desktop:hover {
-        animation: button_in 1s;
+        background-color: rgba(255,255,255,0.1);
     }
     .taskbar-color {
         width:100%;
@@ -284,8 +347,23 @@ export default {
     .task-bottom .task{
         height: 100%;
         width: 48px;
-        margin-right: 1px;
+        margin-left: 1px;
     }
+    .task-bottom .task-opened hr{
+        height: 2px;
+        left:8.335%;
+        bottom: 0;
+        width: 83.33%;
+    }
+    .task-bottom .task:hover hr {
+        width: 100%;
+        left: 0;
+    }
+    .task-bottom .focused hr {
+        width: 100%;
+        left: 0;
+    }
+
     .task-bottom .task-view{
         height: 100%;
         width: 48px;
@@ -300,7 +378,7 @@ export default {
         width: 80px;
         padding-top:1px;
         box-sizing:border-box;
-        line-height: 20px;
+        line-height: 18px;
     }
     .task-bottom .clock-area div:nth-of-type(2) {
         display: none;
@@ -332,7 +410,21 @@ export default {
     .task-top .task{
         height: 100%;
         width: 48px;
-        margin-right: 1px;
+        margin-left: 1px;
+    }
+    .task-top .task-opened hr{
+        height: 2px;
+        left:8.335%;
+        top: 0;
+        width: 83.33%;
+    }
+    .task-top .task:hover hr {
+        width: 100%;
+        left: 0;
+    }
+    .task-top .focused hr {
+        width: 100%;
+        left: 0;
     }
     .task-top .task-view{
         height: 100%;
@@ -348,7 +440,7 @@ export default {
         width: 80px;
         padding-top:1px;
         box-sizing:border-box;
-        line-height: 20px;
+        line-height: 18px;
     }
     .task-top .clock-area div:nth-of-type(2) {
         display: none;
@@ -370,7 +462,6 @@ export default {
         height: 40px;
         width: 100%;
     }
-
     .task-left .search-btn {
         display: block;
         height: 40px;
@@ -382,10 +473,26 @@ export default {
     .task-left .task{
         height: 46px;
         width: 100%;
+        margin-top: 1px;
+    }
+    .task-left .task-opened hr{
+        width: 2px;
+        left:0;
+        top: 8.335%;
+        height: 83.33%;
+    }
+    .task-left .task:hover hr {
+        top: 0;
+        height: 100%;
+    }
+    .task-left .focused hr {
+        top: 0;
+        height: 100%;
     }
     .task-left .task-view{
         height: 40px;
         width: 100%;
+        margin-bottom:2px;
     }
     .task-left .notify-btn{
         height: 32px;
@@ -425,10 +532,26 @@ export default {
     .task-right .task{
         height: 46px;
         width: 100%;
+        margin-top: 1px;
+    }
+    .task-right .task-opened hr{
+        width: 2px;
+        right:0;
+        top: 8.335%;
+        height: 83.33%;
+    }
+    .task-right .task:hover hr {
+        top: 0;
+        height: 100%;
+    }
+    .task-right .focused hr {
+        top: 0;
+        height: 100%;
     }
     .task-right .task-view{
         height: 40px;
         width: 100%;
+        margin-bottom:2px;
     }
     .task-right .notify-btn{
         height: 32px;

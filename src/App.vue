@@ -8,11 +8,12 @@
             <div id="new-window4" style="background-color:blue; width:100px; height:100px;" @click="tryOpen(4)">APP 4</div>
 
             <windows
-                v-for="openedWindow in getAllTaskList"
-                :is="openedWindow.appData"
-                :key="openedWindow.appId"
+                v-for="(openedWindow, index) in getAllTaskList"
+                :key="index"
                 :app-id="openedWindow.appId"
+                ref="windowComp"
             ></windows>
+
         </div>
         <taskbar></taskbar>
     </div>
@@ -22,15 +23,24 @@
 import notifybar from './components/notifybar.vue'
 import taskbar   from './components/taskbar.vue'
 import windows   from './components/windows.vue'
+
 export default {
     components: {
         'notifybar': notifybar,
-        'taskbar': taskbar
+        'taskbar': taskbar,
+        'windows': windows
+    },
+    data: function() {
+        return {
+        }
     },
     mounted: function() {
         this.$nextTick(function() {
             window.addEventListener('resize', this.resizeWindow);
         });
+    },
+    beforeDestroy: function() {
+        window.removeEventListener('resize', this.resizeWindow);
     },
     methods: {
         resizeWindow: function() {
@@ -38,7 +48,7 @@ export default {
         },
         tryOpen: function(appId) {
             if( this.getTaskByAppId(appId) ) {
-                this.$children.forEach(element => {
+                this.$refs.windowComp.forEach(element => {
                     if (element.id == appId) {
                         element.setFocus();
                         return;
@@ -52,20 +62,23 @@ export default {
             return this.getAllTaskList[appId];
         },
         addTask: function(appId) {
-            let vc = windows;
-            this.$store.commit('addTask', {appId: appId, index: Math.floor(Math.random() * 10), appData: vc});
+            this.$store.commit('addTask', {
+                appId: appId,
+                index: this.getZIndex,
+                focused: true
+            });
         }
    },
    computed: {
-       direction: function() {
-           return this.$store.getters.getTaskbarDirection;
-       },
-       getAllTaskList: function() {
-           return this.$store.getters.getAllTaskList;
-       }
-   },
-   beforeDestroy: function() {
-        window.removeEventListener('resize', this.resizeWindow);
+        direction: function() {
+            return this.$store.getters.getTaskbarDirection;
+        },
+        getAllTaskList: function() {
+            return this.$store.getters.getAllTaskList;
+        },
+        getZIndex() {
+            return this.$store.getters.getMaxZIndex;
+        }
    }
 }
 </script>
