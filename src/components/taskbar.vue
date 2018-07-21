@@ -1,23 +1,28 @@
 <template>
 <div class="taskbar" data-component="taskbar">
     <div class="start-btn"></div>
-    <div class="search-bar">Windows 검색</div>
+    <div class="search-bar">
+        <div class="search-icon"></div>
+        <div class="search-text"><span>검색하려면 여기에 입력하십시오.</span></div>
+    </div>
     <div class="search-btn"></div>
 
     <div class="task-view"></div>
-    <div
-        class="task"
-        :task-app-id="openedWindow.appId"
-        :class="{'task-opened': true,'focused':openedWindow.focused}"
-        v-for="(openedWindow) in getSortedAllTaskList"
-        :key="openedWindow.appId"
-        ref="'task'+openedWindow.appId"
-        @click="tryOpen(openedWindow.appId)"
-        @mouseover.once=";"
-    >
-    id:
-    {{openedWindow.appId}}
-    <hr>
+    <div class="task-grid">
+        <div
+            class="task"
+            :task-app-id="openedWindow.appId"
+            :class="{'task-opened': true,'focused':openedWindow.focused}"
+            v-for="(openedWindow) in getSortedAllTaskList"
+            :key="openedWindow.appId"
+            ref="'task'+openedWindow.appId"
+            @click="tryOpen(openedWindow.appId)"
+            @mouseover.once=";"
+        >
+        id:
+        {{openedWindow.appId}}
+        <hr>
+        </div>
     </div>
 
     <div class="task-bar-drag" @mousedown="dragStart">
@@ -63,7 +68,9 @@ export default {
         drag : function (event) {
             if(this.isDrag){
                 if (event.clientX != 0 && event.clientY != 0) {
-                    this.$store.commit('setTaskbarDirection', {direction: this.getCardinalDirection(event.clientX, event.clientY)});
+                    this.$store.commit('setTaskbarDirection', {
+                        direction: this.getCardinalDirection(event.clientX, event.clientY)
+                    });
                 }
             }
         },
@@ -196,7 +203,6 @@ export default {
         z-index: 2147483647;
         flex:none;
         color:white;
-        overflow: hidden;
         position: relative;
         display: flex;
     }
@@ -212,20 +218,40 @@ export default {
         background-image: url('../assets/images/taskbar/start_op0_hover.png');
     }
     .search-bar {
-        background-color: rgb(63,63,63);
+        border-top:1px solid rgb(187,187,187);
+        border-bottom:1px solid rgba(0,0,0,0);
+        background-color: rgb(242,242,242);
         height: 100%;
         width: 344px;
-        padding: 0 9px;
         box-sizing:border-box;
-        color: rgb(159,159,159);
+        color: rgb(43,43,43);
         font-size: 15px;
-        line-height: 40px;
         flex:none;
-        letter-spacing: 0.01em;
+        letter-spacing: 0.005em;
+    }
+    .search-icon {
+        width:40px;
+        height:100%;
+        float:left;
+        background-image: url('../assets/images/taskbar/search.png');
+        background-position: center center;
+        background-repeat: no-repeat;
+    }
+    .search-text {
+        width:304px;
+        height:100%;
+        display:flex;
+        float:left;
+        justify-content:center;
+        flex-direction: column;
+    }
+    .search-bar:hover {
+        background-color: rgb(255,255,255);
+        cursor: text;
     }
     .search-btn {
         flex:none;
-        background-image: url('../assets/images/taskbar/search.png');
+        background-image: url('../assets/images/taskbar/search_w.png');
         background-position: center center;
         background-repeat: no-repeat;
         animation: button_out .2s;
@@ -236,15 +262,22 @@ export default {
     .task-view {
         flex:none;
         animation: button_out .2s;
-        background-image: url('../assets/images/taskbar/task_view.png');
+        background-image: url('../assets/images/taskbar/timeline.png');
         background-position: center center;
         background-repeat: no-repeat;
     }
     .task-view:hover {
         background-color: rgba(255,255,255,0.1);
-        background-image: url('../assets/images/taskbar/task_view_hover.png');
+        background-image: url('../assets/images/taskbar/timeline_hover.png');
         background-position: center center;
         background-repeat: no-repeat;
+    }
+    .task-grid {
+        display:flex;
+        flex-wrap: wrap;
+        flex-direction: inherit;
+        flex: none;
+        overflow: auto;
     }
     .task {
         position: relative;
@@ -253,7 +286,6 @@ export default {
         animation: button_out .2s;
     }
     .task:hover {
-        /* background-color: rgba(255,255,255,0.1); */
         background-color: rgba(255,255,255,0.1);
     }
     .task.focused {
@@ -274,6 +306,7 @@ export default {
     .task-bar-drag {
         height: 100%;
         width: 100%;
+        min-width: 9px;
         flex-basis: auto;
         flex-grow: 0;
         flex-shrink: 1;
@@ -318,19 +351,11 @@ export default {
         z-index:-2;
         background-color:#000000;
         opacity: 0.84;
-        /*이 부분을 다시 주석하고 아래 주석을 해제하면 작업 표시줄 블러링이 구현됨.
-        다만 표시줄 아래로 투영되는 창은 블러링은 커녕 보이지도 않는다.
-        배경화면 이미지 용량만큼 트래픽이 파바박 늘어나는건 덤*/
     }
     .taskbar-gaussian-bg {
         width:100vw;
         height:100vh;
         z-index:-1;
-    /*      background-image: url('../assets/images/desktop/bg_gaussian55.jpg');
-        background-position: center;
-        background-size: cover;
-        background-attachment: fixed;
-        opacity: 0.17;*/
     }
     .task-bottom .taskbar {
         height: 40px;
@@ -345,7 +370,7 @@ export default {
         width: 0;
     }
     .task-bottom .task{
-        height: 100%;
+        height: 40px;
         width: 48px;
         margin-left: 1px;
     }
@@ -408,7 +433,7 @@ export default {
         display: none;
     }
     .task-top .task{
-        height: 100%;
+        height: 40px;
         width: 48px;
         margin-left: 1px;
     }

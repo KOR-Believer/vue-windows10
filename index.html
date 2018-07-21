@@ -3,13 +3,9 @@
   <head>
     <meta charset="utf-8">
     <title>vue-windows10</title>
-    <!-- <script>
-    window.setDragImageIEPreload = function (image) { var bodyEl, preloadEl; bodyEl = document.body; preloadEl = document.createElement("div"); preloadEl.style.background = 'url("' + image.src + '")'; preloadEl.style.position = "absolute"; preloadEl.style.opacity = 0.001; bodyEl.appendChild(preloadEl); setTimeout(function () { bodyEl.removeChild(preloadEl); }, 5000); }; if ("function" !== typeof DataTransfer.prototype.setDragImage) { DataTransfer.prototype.setDragImage = function (image, offsetX, offsetY) { var randomDraggingClassName, dragStylesCSS, dragStylesEl, headEl, parentFn, eventTarget; randomDraggingClassName = "setdragimage-ie-dragging-" + Math.round(Math.random() * Math.pow(10, 5)) + "-" + Date.now(); dragStylesCSS = ["." + randomDraggingClassName, "{", 'background: url("' + image.src + '") no-repeat #fff 0 0 !important;', "width: " + image.width + "px !important;", "height: " + image.height + "px !important;", "text-indent: -9999px !important;", "border: 0 !important;", "outline: 0 !important;", "}", "." + randomDraggingClassName + " * {", "display: none !important;", "}"]; dragStylesEl = document.createElement("style"); dragStylesEl.innerText = dragStylesCSS.join(""); headEl = document.getElementsByTagName("head")[0]; headEl.appendChild(dragStylesEl); parentFn = DataTransfer.prototype.setDragImage.caller; while (!(parentFn.arguments[0] instanceof DragEvent)) { parentFn = parentFn.caller; } eventTarget = parentFn.arguments[0].target; eventTarget.classList.add(randomDraggingClassName); setTimeout(function () { headEl.removeChild(dragStylesEl); eventTarget.classList.remove(randomDraggingClassName); }, 0); }; }
-    </script> -->
   </head>
   <body>
     <div id="app"></div>
     <script src="/dist/build.js"></script>
   </body>
 </html>
-<!-- https://jsfiddle.net/Linusborg/Lx49LaL8/ -->
