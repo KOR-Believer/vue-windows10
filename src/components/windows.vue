@@ -95,7 +95,6 @@ export default {
             overlayDisplay: 'none',
             overlayCursor: '',
             isFocused: true,
-            preFocused: false,
             invisible: false,
             isMaximized: false,
             isMinimized: false,
@@ -105,7 +104,7 @@ export default {
                 top:    '100px',
                 left:   '200px',
                 zIndex: 0,
-                transform: 'none'
+                transform: 'inherit'
             },
             temporaryStyle: {
                 refMouseX: 0,
@@ -161,7 +160,7 @@ export default {
         },
         tryOpen: function(){
             if ( this.isMinimized ) {
-                this.$_windows_unMinimize();
+                this.unMinimizeWindow();
                 let beforeNext = this.nextFocusedWindowId;
                 this.$store.commit('setTemporaryWindowId', {
                     beforeNext: beforeNext
@@ -175,17 +174,11 @@ export default {
                 this.windowStyle.zIndex = this.getNewZIndex();
                 this.setCurrentTopWindow(this.id);
             } else {
-
                 if (this.id == this.getCurrentTopWindowId) {
-                    // this.preFocused = !this.preFocused;
-                    // if (!this.preFocused) {
-                        this.setCurrentTopWindow(this.nextFocusedWindowId);
-                        this.nextFocusedWindowId = 0;
-                        this.$store.commit('setFocus', {appId: this.id, focused: false});
-                        this.$_windows_minimize();
-                    // } else {
-                    //     this.setFocus();
-                    // }
+                    this.setCurrentTopWindow(this.nextFocusedWindowId);
+                    this.nextFocusedWindowId = 0;
+                    this.$store.commit('setFocus', {appId: this.id, focused: false});
+                    this.minimizeWindow();
                 } else {
                     this.setFocus();
                 }
@@ -338,11 +331,19 @@ export default {
                 this.$store.commit('deleteTask', {appId: this.id, next: this.nextFocusedWindowId});
             }, 150);
         },
-        $_windows_minimize: function() {
+        minimizeWindow: function() {
             this.isMinimized = true;
             let icon = this.getTaskBarIconPosition();
-            let windowX = parseInt(this.windowStyle.left,10) + (parseInt(this.windowStyle.width,10) / 2);
-            let windowY = parseInt(this.windowStyle.top,10) + (parseInt(this.windowStyle.height,10) / 2);
+            let windowX = 0;
+            let windowY = 0;
+            if (this.isMaximized) {
+                let desktopArea = this.getFullScreenPosition();
+                windowX = desktopArea.x;
+                windowY = desktopArea.y;
+            } else {
+                windowX = parseInt(this.windowStyle.left,10) + (parseInt(this.windowStyle.width,10) / 2);
+                windowY = parseInt(this.windowStyle.top,10) + (parseInt(this.windowStyle.height,10) / 2);
+            }
             let posX = icon.x - windowX;
             let posY = icon.y - windowY;
             this.windowStyle.zIndex = 2147483647;
@@ -354,7 +355,7 @@ export default {
                     {
                         translateX: posX+'px',
                         translateY: posY+'px',
-                        opacity: -0.2,
+                        opacity: -0.4,
                         scale: 0.0
                     },
                     {
@@ -368,24 +369,32 @@ export default {
             }
 
         },
-        $_windows_unMinimize: function() {
+        unMinimizeWindow: function() {
             this.isMinimized = false;
             let icon = this.getTaskBarIconPosition();
-            let windowX = parseInt(this.windowStyle.left,10) + (parseInt(this.windowStyle.width,10) / 2);
-            let windowY = parseInt(this.windowStyle.top,10) + (parseInt(this.windowStyle.height,10) / 2);
+            let windowX = 0;
+            let windowY = 0;
+            if (this.isMaximized) {
+                let desktopArea = this.getFullScreenPosition();
+                windowX = desktopArea.x;
+                windowY = desktopArea.y;
+            } else {
+                windowX = parseInt(this.windowStyle.left,10) + (parseInt(this.windowStyle.width,10) / 2);
+                windowY = parseInt(this.windowStyle.top,10) + (parseInt(this.windowStyle.height,10) / 2);
+            }
             let posX = icon.x - windowX;
             let posY = icon.y - windowY;
 
             if( this.$el ) {
                 let el = this.$refs.windowBody;
                 Velocity(el, 'stop');
-                this.windowStyle.transform = "inherit";
+                this.windowStyle.transform = "none";
                 Velocity(
                     el,
                     {
                         translateX: posX+'px',
                         translateY: posY+'px',
-                        opacity: -0.2,
+                        opacity: -0.4,
                         scale:0.0
                     },
                     {
@@ -404,8 +413,7 @@ export default {
                                     duration: 250,
                                     easing: [0.420, 0.000, 1.000, 1.000], //'ease-in',
                                     complete: () => {
-
-                                        this.windowStyle.transform = "none";
+                                        this.windowStyle.transform = "inherit";
                                     }
                                 }
                             );
@@ -430,6 +438,14 @@ export default {
                 };
             }
             return ob[this.id];
+        },
+        getFullScreenPosition: function() {
+            let d = document.getElementsByClassName('desktop')[0];
+            d = d.getBoundingClientRect();
+            return {
+                x: d.left + (d.width / 2),
+                y: d.top + (d.height / 2)
+            }
         },
 
         getNewZIndex: function() {
@@ -467,7 +483,7 @@ export default {
                 this.windowStyle.zIndex = this.getNewZIndex();
 
                 if ( this.isMinimized ) {
-                    this.$_windows_unMinimize();
+                    this.unMinimizeWindow();
                 }
 
             } else if ( this.nextFocusedWindowId == this.getCurrentTopWindowId ) {
@@ -559,9 +575,9 @@ export default {
 }
 
 .invisible {
-    transition: all .15s ease-out;
-    transform: scale(0.95);
-    opacity: 0;
+    transition: all .15s ease-out !important;
+    transform: scale(0.95) !important;
+    opacity: 0 !important;
 }
 
 .window-border-top {
