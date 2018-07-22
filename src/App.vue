@@ -1,19 +1,21 @@
 <template>
-    <div id="wrap" :class="'task-'+direction">
+    <div class="wrapper" :class="'task-'+direction">
         <div class="desktop">
             <notifybar></notifybar>
-            <div id="new-window1" style="background-color:blue; width:100px; height:100px;" @click="tryOpen(1)">APP 1</div>
-            <div id="new-window2" style="background-color:blue; width:100px; height:100px;" @click="tryOpen(2)">APP 2</div>
-            <div id="new-window3" style="background-color:blue; width:100px; height:100px;" @click="tryOpen(3)">APP 3</div>
-            <div id="new-window4" style="background-color:blue; width:100px; height:100px;" @click="tryOpen(4)">APP 4</div>
-
+            <icongrid :icon-list="mockicons"></icongrid>
             <windows
-                v-for="(openedWindow, index) in getAllTaskList"
-                :key="index"
-                :app-id="openedWindow.appId"
-                ref="windowComp"
+                v-for="(app) in getAppList"
+                :key="app.processId"
+                :argv="app.argv"
+                :process-id="app.processId"
+                :z-index="app.zIndex"
+                :focused="app.focused"
+                :minimized="app.minimized"
+                :width="app.width"
+                :height="app.height"
+                :title="app.title"
+                :iconImage="app.iconImage"
             ></windows>
-
         </div>
         <taskbar></taskbar>
     </div>
@@ -23,15 +25,65 @@
 import notifybar from './components/notifybar.vue'
 import taskbar   from './components/taskbar.vue'
 import windows   from './components/windows.vue'
+import icongrid  from './components/icongrid.vue'
 
 export default {
     components: {
         'notifybar': notifybar,
         'taskbar': taskbar,
-        'windows': windows
+        'windows': windows,
+        'icongrid':icongrid
     },
     data: function() {
         return {
+            mockicons : [
+                {
+                    title: "SOCC - Study Oriented Coding Club",
+                    iconImage: "./images/icongrid/socc_character_256.png",
+                     width:'980px',
+                    height:'630px',
+                    argv: {
+                        appId: 1,
+                        mode: 'iframe',
+                        src: 'https://socc-io.github.io/home'
+                    }
+                },
+                {
+                    title: "네이버",
+                    iconImage: "./images/icongrid/naver.png",
+                    width:'400px',
+                    height:'700px',
+                    argv: {
+                        appId: 1,
+                        mode: 'iframe',
+                        src: 'https://cors.io?https://m.naver.com'
+                    }
+                },
+                {
+                    title: "OpenTutorials",
+                    iconImage: "./images/icongrid/opentutorials.png",
+                    width:'1098px',
+                    height:'680px',
+                    argv: {
+                        appId: 1,
+                        mode: 'iframe',
+                        src: 'https://opentutorials.org/'
+                    }
+                },
+                {
+                    title: "명령 프롬프트",
+                    iconImage: "./images/icongrid/console.png",
+                    width:'600px',
+                    height:'400px',
+                    argv: {
+                        appId: 1,
+                        mode: 'iframe',
+                        src: 'https://rocky-basin-3981.herokuapp.com/app/cmd'
+                    }
+                }
+
+
+            ]
         }
     },
     mounted: function() {
@@ -45,28 +97,6 @@ export default {
     methods: {
         resizeWindow: function() {
             this.$store.commit('screenRecalculation');
-        },
-        tryOpen: function(appId) {
-            if( this.getTaskByAppId(appId) ) {
-                this.$refs.windowComp.forEach(element => {
-                    if (element.id == appId) {
-                        element.setFocus();
-                        return;
-                    }
-                });
-            } else {
-                this.addTask(appId);
-            }
-        },
-        getTaskByAppId: function(appId) {
-            return this.getAllTaskList[appId];
-        },
-        addTask: function(appId) {
-            this.$store.commit('addTask', {
-                appId: appId,
-                index: this.getZIndex,
-                focused: true
-            });
         }
    },
    computed: {
@@ -75,6 +105,10 @@ export default {
         },
         getAllTaskList: function() {
             return this.$store.getters.getAllTaskList;
+        },
+
+        getAppList: function(){
+            return this.$store.getters.getAppList
         },
         getZIndex() {
             return this.$store.getters.getMaxZIndex;
@@ -87,6 +121,8 @@ export default {
     margin: 0;
     padding: 0;
     border: 0;
+    min-height: 0;
+    min-width: 0;
     font-family: 'Segoe UI', 'malgun gothic';
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -95,18 +131,37 @@ export default {
     -ms-user-select: none;
     user-select: none;
 }
+*:focus {
+    outline: none
+}
 body {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-    background-image: url('./assets/images/desktop/bg_normal.jpg');
+    background: #FFF;
+    background-image: url('./assets/images/desktop/bg.jpg');
     background-size: cover;
     background-position: center;
+}
+.selection {
+    background: rgba(0, 102, 204, 0.2745);
+    border: 1px solid rgb(0, 120, 215);
+    z-index: 4;
+}
+.overlay{
+    filter: blur(25px);
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    z-index: 1100;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
 }
 </style>
 
 <style scoped>
-#wrap {
+.wrapper {
     width: inherit;
     height: inherit;
     display: flex;
@@ -114,7 +169,8 @@ body {
 .desktop {
     position: relative;
     display: flex;
-    flex:1;
+    flex:1 0 0;
+    /* margin-top:5px; */
     width:inherit;
     height:inherit;
     flex-direction: column;

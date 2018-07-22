@@ -1,5 +1,5 @@
 <template>
-  <div id="notifybar" class="notifybar">
+  <div class="notifybar">
         <div></div>
         <div style="font-size: 1.16em; color:white; height:56px; margin-top:2px; line-height:52px; text-indent: 11px;">알림</div>
         <div>
@@ -19,7 +19,6 @@
 
         </div>
     </div>
-    <!-- <div id="notifycover" class="notify-cover"></div> -->
 </template>
 
 <script>

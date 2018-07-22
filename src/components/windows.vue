@@ -1,15 +1,14 @@
 <template>
 <div
     class="window-body"
-    ref="windowBody"
     :class="{
-        'focused-window': isFocused,
+        'focused-window': focused,
         'maximize-window': isMaximized,
         'invisible': invisible
     }"
     @mousedown="inside"
-    :style="windowStyle"
     v-mousedown-outside="outside"
+    :style="windowStyle"
 >
     <div class="window-border-top">
         <div
@@ -38,27 +37,27 @@
             <div class="title-bar">
                 <div
                     class="title-bar-icon"
-                    :style="{backgroundImage: 'url('+require('../assets/appData/freeTalk/icon.png')+')'}"
+                    :style="{backgroundImage: 'url('+iconImages(this.iconImage)+')'}"
                 ></div>
                 <div
                     class="window-title"
                     @mousedown="dragStart('title-bar', $event)"
                     @touchstart="dragStart('title-bar', $event)"
-                    @dblclick="maximizeWindow"
+                    @dblclick="toggleMaximizeWindow"
                 >
-                    {{id}}
+                    {{title}}
                 </div>
                 <div
                     class="minimize-button"
                     :class="minimizeButtonOut"
                     @mouseover.once="minimizeButtonOut='minimize-button-out'"
-                    @click="tryOpen"
+                    @click="toggleMinimizeWindow"
                 ></div>
                 <div
                     class="maximize-button"
                     :class="maximizeButtonOut"
                     @mouseover.once="maximizeButtonOut='maximize-button-out'"
-                    @click="maximizeWindow"
+                    @click="toggleMaximizeWindow"
                 ></div>
                 <div
                     class="close-button"
@@ -68,9 +67,16 @@
                 ></div>
             </div>
             <div class="main-panel">
-                <div class="iframe-inner" style="height: 100%;"></div>
-                <!-- <iframe src="http://127.0.0.1:8080" class="iframe-inner" style="height: 100%;"></iframe> -->
+                <template v-if="mode=='iframe'">
+                    <spinning-loader v-show="!loaded"></spinning-loader>
+                    <iframe :src="extra.src" class="iframe-inner" @load="loaded=true"></iframe>
+                    <div class="iframe-cover" v-show="!focused"></div>
+                </template>
+                <template  v-else>
+                <div class="iframe-inner">
 
+                </div>
+                </template>
                 <div class="window-overlay" :style="{display: overlayDisplay, cursor: overlayCursor}"></div>
             </div>
         </div>
@@ -86,29 +92,41 @@
 
 <script>
 import velocity from 'velocity-animate'
+import spinningLoader  from './spinningLoader.vue'
 export default {
-    props: ['appId'],
+    props: [
+        'processId',
+        'argv',
+        'minimized',
+        'focused',
+        'zIndex',
+        'width',
+        'height',
+        'iconImage',
+        'title'
+    ],
+     components: {
+        'spinningLoader': spinningLoader,
+    },
     data () {
         return {
-            id: this.appId,
-            title: '',
+            id: this.processId,
             minWidth : 190,
             minHeight: 46,
+            loaded: false,
             isDrag: false,
             chromeIgnore: false,
             windowsAction: 'none',
             overlayDisplay: 'none',
             overlayCursor: '',
-            isFocused: true,
             invisible: false,
             isMaximized: false,
-            isMinimized: false,
             windowStyle: {
                 width:  '400px',
                 height: '300px',
-                top:    '100px',
-                left:   '200px',
-                zIndex: 0,
+                top: 0,
+                left:0,
+                zIndex: this.zIndex,
                 transform: 'inherit'
             },
             temporaryStyle: {
@@ -122,249 +140,230 @@ export default {
             minimizeButtonOut:'',
             maximizeButtonOut:'',
             closeButtonOut:'',
-            nextFocusedWindowId: 0
+            mode:'',
+            extra: {
+            }
         }
     },
     created: function() {
-        this.setFocus();
+        if (this.argv.mode == 'iframe') {
+            this.mode = 'iframe'
+            this.$set(this.extra,"src",this.argv.src)
+        }
+        this.windowStyle.height = this.height
+        this.windowStyle.width = this.width
     },
     mounted: function() {
-        window.addEventListener('mouseup', this.dragEnd);
-        window.addEventListener('mousemove', this.drag);
-        window.addEventListener('touchend',this.dragEnd);
-        window.addEventListener('touchmove',this.drag);
+        this.windowStyle.top  = ((this.getScreenHeight-parseInt(this.windowStyle.height,10))/2)+'px'
+        this.windowStyle.left = ((this.getScreenWidth-parseInt(this.windowStyle.width,10))/2)+'px'
+        if(this.minimized) this.minimizeWindow()
 
     },
     beforeDestroy: function() {
-        window.removeEventListener('mouseup', this.dragEnd);
-        window.removeEventListener('mousemove', this.drag);
-        window.removeEventListener('touchend',this.dragEnd);
-        window.removeEventListener('touchmove',this.drag);
+        window.removeEventListener('mouseup', this.dragEnd)
+        window.removeEventListener('mousemove', this.drag)
+        window.removeEventListener('touchend',this.dragEnd)
+        window.removeEventListener('touchmove',this.drag)
     },
     methods: {
-        outside: function() {
-            if (this.isFocused) {
-                this.$store.commit('setFocus', {appId: this.id, focused: false});
-                this.isFocused = false;
-            }
-        },
         inside: function() {
-            if (!this.isFocused) {
-                this.setFocus();
+            if (!this.focused) {
+                this.setFocus(true)
             }
         },
-        setFocus: function(){
-            let beforeNext = this.nextFocusedWindowId;
-            this.$store.commit('setTemporaryWindowId', {
-                beforeNext: beforeNext
-            });
-
-            this.nextFocusedWindowId = this.getCurrentTopWindowId;
-            this.isFocused = true;
-            this.$store.commit('setFocus', {
-                appId: this.id,
-                focused: true
-            });
-            this.windowStyle.zIndex = this.getNewZIndex();
-            this.setCurrentTopWindow(this.id);
+        outside: function () {
+            if (this.focused) {
+                this.setFocus(false)
+            }
         },
-        tryOpen: function(){
-            if ( this.isMinimized ) {
-                this.unMinimizeWindow();
-                let beforeNext = this.nextFocusedWindowId;
-                this.$store.commit('setTemporaryWindowId', {
-                    beforeNext: beforeNext
-                });
-                this.nextFocusedWindowId = this.getCurrentTopWindowId;
-                this.isFocused = true;
-                this.$store.commit('setFocus', {
-                    appId: this.id,
-                    focused: true
-                });
-                this.windowStyle.zIndex = this.getNewZIndex();
-                this.setCurrentTopWindow(this.id);
+        setFocus: function(focus){
+            this.$store.commit('setFocus', {processId:this.processId, focused: focus})
+        },
+        toggleMinimizeWindow: function(){
+            if ( this.minimized ) {
+                this.$store.commit('unMinimize', this.processId)
             } else {
-                if (this.id == this.getCurrentTopWindowId) {
-                    this.setCurrentTopWindow(this.nextFocusedWindowId);
-                    this.nextFocusedWindowId = 0;
-                    this.$store.commit('setFocus', {appId: this.id, focused: false});
-                    this.minimizeWindow();
-                } else {
-                    this.setFocus();
-                }
+                this.$store.commit('minimize', this.processId)
             }
         },
-        maximizeWindow: function(){
-            this.isMaximized = !this.isMaximized;
+        toggleMaximizeWindow: function(){
+            this.isMaximized = !this.isMaximized
         },
         dragStart: function(action, e) {
-            let clientX = (e.clientX) ? e.clientX : e.touches[0].clientX;
-            let clientY = (e.clientY) ? e.clientY : e.touches[0].clientY;
-            this.temporaryStyle.refMouseX = clientX;
-            this.temporaryStyle.refMouseY = clientY;
-            this.windowsAction            = action;
-            this.temporaryStyle.refWidth  = parseInt(this.windowStyle.width,  10);
-            this.temporaryStyle.refHeight = parseInt(this.windowStyle.height, 10);
-            this.temporaryStyle.refLeft   = parseInt(this.windowStyle.left,   10);
-            this.temporaryStyle.refTop    = parseInt(this.windowStyle.top,    10);
-            this.isDrag = true;
-            this.chromeIgnore = true;
+            let clientX = (e.clientX) ? e.clientX : e.touches[0].clientX
+            let clientY = (e.clientY) ? e.clientY : e.touches[0].clientY
+            this.temporaryStyle.refMouseX = clientX
+            this.temporaryStyle.refMouseY = clientY
+            this.windowsAction            = action
+            this.temporaryStyle.refWidth  = parseInt(this.windowStyle.width,  10)
+            this.temporaryStyle.refHeight = parseInt(this.windowStyle.height, 10)
+            this.temporaryStyle.refLeft   = parseInt(this.windowStyle.left,   10)
+            this.temporaryStyle.refTop    = parseInt(this.windowStyle.top,    10)
+            this.isDrag = true
+            this.chromeIgnore = true
+            window.addEventListener('mouseup', this.dragEnd)
+            window.addEventListener('mousemove', this.drag)
+            window.addEventListener('touchend',this.dragEnd)
+            window.addEventListener('touchmove',this.drag)
         },
         drag : function(e) {
 
             //bug fix: chrome trigger mousemove event on mousedown
             if (this.chromeIgnore) {
-                this.chromeIgnore = false;
-                return;
+                this.chromeIgnore = false
+                return
             }
             if (this.isDrag) {
                 if (this.overlayDisplay == 'none') {
-                    this.overlayDisplay = 'block';
+                    this.overlayDisplay = 'block'
                 }
-                let clientX = (e.clientX) ? e.clientX : e.touches[0].clientX;
-                let clientY = (e.clientY) ? e.clientY : e.touches[0].clientY;
+                let clientX = (e.clientX) ? e.clientX : e.touches[0].clientX
+                let clientY = (e.clientY) ? e.clientY : e.touches[0].clientY
 
-                let offsetX = clientX - this.temporaryStyle.refMouseX;
-                let offsetY = clientY - this.temporaryStyle.refMouseY;
-                let nWidth, nHeight;
+                let offsetX = clientX - this.temporaryStyle.refMouseX
+                let offsetY = clientY - this.temporaryStyle.refMouseY
+                let nWidth, nHeight
                 if (clientX || clientY) {
                     switch (this.windowsAction) {
                         case "title-bar":
                             if (this.isMaximized) {
-                                this.windowStyle.top       = '-16px';
-                                this.temporaryStyle.refTop = -16;
-                                this.isMaximized = false;
-                                let windowWidth  = parseInt(this.windowStyle.width);
-                                let leftClip     = this.temporaryStyle.refMouseX - (windowWidth / 2);
-                                let rightClip    = this.temporaryStyle.refMouseX + (windowWidth / 2);
+                                this.windowStyle.top       = '-16px'
+                                this.temporaryStyle.refTop = -16
+                                this.isMaximized = false
+                                let windowWidth  = parseInt(this.windowStyle.width)
+                                let leftClip     = this.temporaryStyle.refMouseX - (windowWidth / 2)
+                                let rightClip    = this.temporaryStyle.refMouseX + (windowWidth / 2)
                                 if (leftClip < -8) {
-                                    leftClip = -8;
+                                    leftClip = -8
                                 }
 
                                 if (rightClip > this.getScreenWidth) {
-                                    leftClip = this.getScreenWidth - windowWidth + 8;
+                                    leftClip = this.getScreenWidth - windowWidth + 8
                                 }
-                                this.temporaryStyle.refLeft = leftClip;
-                                this.windowStyle.left = leftClip+'px';
-                                break;
+                                this.temporaryStyle.refLeft = leftClip
+                                this.windowStyle.left = leftClip+'px'
+                                break
                             }
-                            this.windowStyle.left = this.temporaryStyle.refLeft + offsetX + 'px';
-
-                            this.windowStyle.top  = this.temporaryStyle.refTop  + offsetY + 'px';
-                            break;
+                            this.windowStyle.left = this.temporaryStyle.refLeft + offsetX + 'px'
+                            this.windowStyle.top  = this.temporaryStyle.refTop  + offsetY + 'px'
+                            break
 
                         case "se-resize":
-                            nWidth  = this.temporaryStyle.refWidth  + offsetX;
-                            nHeight = this.temporaryStyle.refHeight + offsetY;
+                            nWidth  = this.temporaryStyle.refWidth  + offsetX
+                            nHeight = this.temporaryStyle.refHeight + offsetY
                             if (nWidth > this.minWidth)
-                                this.windowStyle.width  = nWidth  + 'px';
+                                this.windowStyle.width  = nWidth  + 'px'
                             if (nHeight > this.minHeight)
-                                this.windowStyle.height = nHeight + 'px';
-                            break;
+                                this.windowStyle.height = nHeight + 'px'
+                            break
 
                         case "e-resize":
-                            nWidth = this.temporaryStyle.refWidth + offsetX;
+                            nWidth = this.temporaryStyle.refWidth + offsetX
                             if (nWidth > this.minWidth)
-                                this.windowStyle.width = nWidth + 'px';
-                            break;
+                                this.windowStyle.width = nWidth + 'px'
+                            break
 
                         case "s-resize":
-                            nHeight = this.temporaryStyle.refHeight + offsetY;
+                            nHeight = this.temporaryStyle.refHeight + offsetY
                             if (nHeight > this.minHeight)
-                                this.windowStyle.height = nHeight + 'px';
-                            break;
+                                this.windowStyle.height = nHeight + 'px'
+                            break
 
                         case "w-resize":
-                            nWidth = this.temporaryStyle.refWidth - offsetX;
+                            nWidth = this.temporaryStyle.refWidth - offsetX
                             if (nWidth > this.minWidth) {
-                                this.windowStyle.left  = this.temporaryStyle.refLeft + offsetX + 'px';
-                                this.windowStyle.width = nWidth + 'px';
+                                this.windowStyle.left  = this.temporaryStyle.refLeft + offsetX + 'px'
+                                this.windowStyle.width = nWidth + 'px'
                             }
-                            break;
+                            break
 
                         case "n-resize":
-                            nHeight = this.temporaryStyle.refHeight - offsetY;
+                            nHeight = this.temporaryStyle.refHeight - offsetY
                             if (nHeight > this.minHeight) {
-                                this.windowStyle.top    = this.temporaryStyle.refTop + offsetY + 'px';
-                                this.windowStyle.height = nHeight +'px';
+                                this.windowStyle.top    = this.temporaryStyle.refTop + offsetY + 'px'
+                                this.windowStyle.height = nHeight +'px'
                             }
-                            break;
+                            break
 
                         case "nw-resize":
-                            nHeight = this.temporaryStyle.refHeight - offsetY;
-                            nWidth  = this.temporaryStyle.refWidth  - offsetX;
+                            nHeight = this.temporaryStyle.refHeight - offsetY
+                            nWidth  = this.temporaryStyle.refWidth  - offsetX
                             if (nHeight > this.minHeight) {
-                                this.windowStyle.top    = this.temporaryStyle.refTop + offsetY + 'px';
-                                this.windowStyle.height = nHeight +'px';
+                                this.windowStyle.top    = this.temporaryStyle.refTop + offsetY + 'px'
+                                this.windowStyle.height = nHeight +'px'
                             }
                             if (nWidth > this.minWidth) {
-                                this.windowStyle.left  = this.temporaryStyle.refLeft + offsetX + 'px';
-                                this.windowStyle.width = nWidth + 'px';
+                                this.windowStyle.left  = this.temporaryStyle.refLeft + offsetX + 'px'
+                                this.windowStyle.width = nWidth + 'px'
                             }
-                            break;
+                            break
 
                         case "ne-resize":
-                            nHeight = this.temporaryStyle.refHeight - offsetY;
-                            nWidth  = this.temporaryStyle.refWidth  + offsetX;
+                            nHeight = this.temporaryStyle.refHeight - offsetY
+                            nWidth  = this.temporaryStyle.refWidth  + offsetX
                             if (nHeight > this.minHeight) {
-                                this.windowStyle.top    = this.temporaryStyle.refTop + offsetY + 'px';
-                                this.windowStyle.height = nHeight + 'px';
+                                this.windowStyle.top    = this.temporaryStyle.refTop + offsetY + 'px'
+                                this.windowStyle.height = nHeight + 'px'
                             }
                             if (nWidth > this.minWidth)
-                                this.windowStyle.width = nWidth + 'px';
-                            break;
+                                this.windowStyle.width = nWidth + 'px'
+                            break
 
                         case "sw-resize":
-                            nHeight = this.temporaryStyle.refHeight + offsetY;
-                            nWidth  = this.temporaryStyle.refWidth  - offsetX;
+                            nHeight = this.temporaryStyle.refHeight + offsetY
+                            nWidth  = this.temporaryStyle.refWidth  - offsetX
                             if(nHeight > this.minHeight)
-                                this.windowStyle.height = nHeight +'px';
+                                this.windowStyle.height = nHeight +'px'
                             if (nWidth > this.minWidth) {
-                                this.windowStyle.left  = this.temporaryStyle.refLeft + offsetX + 'px';
-                                this.windowStyle.width = nWidth + 'px';
+                                this.windowStyle.left  = this.temporaryStyle.refLeft + offsetX + 'px'
+                                this.windowStyle.width = nWidth + 'px'
                             }
-                            break;
+                            break
                         // default:
                     }
                     if (this.windowsAction != 'title-bar') {
-                        this.overlayCursor = this.windowsAction;
+                        this.overlayCursor = this.windowsAction
                     }
                 }
             }
         },
         dragEnd: function(e) {
-            this.isDrag         = false;
-            this.overlayDisplay = 'none';
-            this.overlayCursor  = 'default';
+            this.isDrag         = false
+            this.overlayDisplay = 'none'
+            this.overlayCursor  = 'default'
             if(parseInt(this.windowStyle.top) < -8){
-                this.windowStyle.top = "-8px";
+                this.windowStyle.top = "-8px"
             }
+            window.removeEventListener('mouseup', this.dragEnd)
+            window.removeEventListener('mousemove', this.drag)
+            window.removeEventListener('touchend',this.dragEnd)
+            window.removeEventListener('touchmove',this.drag)
         },
         close: function(e) {
-            this.invisible = true;
+            this.invisible = true
             setTimeout(() => {
-                this.$store.commit('deleteTask', {appId: this.id, next: this.nextFocusedWindowId});
-            }, 150);
+                this.$store.commit('deleteApp', this.processId)
+            }, 150)
         },
+        // animation
         minimizeWindow: function() {
-            this.isMinimized = true;
-            let icon = this.getTaskBarIconPosition();
-            let windowX = 0;
-            let windowY = 0;
+            let icon = this.getTaskBarIconPosition()
+            let windowX = 0
+            let windowY = 0
             if (this.isMaximized) {
-                let desktopArea = this.getFullScreenPosition();
-                windowX = desktopArea.x;
-                windowY = desktopArea.y;
+                let desktopArea = this.getFullScreenPosition()
+                windowX = desktopArea.x
+                windowY = desktopArea.y
             } else {
-                windowX = parseInt(this.windowStyle.left,10) + (parseInt(this.windowStyle.width,10) / 2);
-                windowY = parseInt(this.windowStyle.top,10) + (parseInt(this.windowStyle.height,10) / 2);
+                windowX = parseInt(this.windowStyle.left,10) + (parseInt(this.windowStyle.width,10) / 2)
+                windowY = parseInt(this.windowStyle.top,10) + (parseInt(this.windowStyle.height,10) / 2)
             }
-            let posX = icon.x - windowX;
-            let posY = icon.y - windowY;
-            this.windowStyle.zIndex = 2147483647;
+            let posX = icon.x - windowX
+            let posY = icon.y - windowY
+            this.windowStyle.zIndex = 2147483647
             if( this.$el ) {
-                let el = this.$refs.windowBody;
-                Velocity(el, 'stop');
+                let el = this.$el
+                Velocity(el, 'stop')
                 Velocity(
                     el,
                     {
@@ -374,36 +373,36 @@ export default {
                         scale: 0.0
                     },
                     {
-                        duration: 250,
+                        duration: 200,
                         easing: [0.420, 0.000, 1.000, 1.000], //'ease-out',
                         complete: function () {
 
                         }
                     }
-                );
+                )
             }
 
         },
+        // animation
         unMinimizeWindow: function() {
-            this.isMinimized = false;
-            let icon = this.getTaskBarIconPosition();
-            let windowX = 0;
-            let windowY = 0;
+            let icon = this.getTaskBarIconPosition()
+            let windowX = 0
+            let windowY = 0
             if (this.isMaximized) {
-                let desktopArea = this.getFullScreenPosition();
-                windowX = desktopArea.x;
-                windowY = desktopArea.y;
+                let desktopArea = this.getFullScreenPosition()
+                windowX = desktopArea.x
+                windowY = desktopArea.y
             } else {
-                windowX = parseInt(this.windowStyle.left,10) + (parseInt(this.windowStyle.width,10) / 2);
-                windowY = parseInt(this.windowStyle.top,10) + (parseInt(this.windowStyle.height,10) / 2);
+                windowX = parseInt(this.windowStyle.left,10) + (parseInt(this.windowStyle.width,10) / 2)
+                windowY = parseInt(this.windowStyle.top,10) + (parseInt(this.windowStyle.height,10) / 2)
             }
-            let posX = icon.x - windowX;
-            let posY = icon.y - windowY;
+            let posX = icon.x - windowX
+            let posY = icon.y - windowY
 
             if( this.$el ) {
-                let el = this.$refs.windowBody;
-                Velocity(el, 'stop');
-                this.windowStyle.transform = "none";
+                let el = this.$el
+                Velocity(el, 'stop')
+                this.windowStyle.transform = "none"
                 Velocity(
                     el,
                     {
@@ -425,119 +424,58 @@ export default {
                                     scale:1
                                 },
                                 {
-                                    duration: 250,
+                                    duration: 200,
                                     easing: [0.420, 0.000, 1.000, 1.000], //'ease-in',
                                     complete: () => {
-                                        this.windowStyle.transform = "inherit";
+                                        this.windowStyle.transform = "inherit"
                                     }
                                 }
-                            );
+                            )
                         }
                     }
-                );
-
+                )
             }
-
         },
 
         getTaskBarIconPosition: function(){
-            let tasks = document.getElementsByClassName('task');
-            let i = 0;
-            let ob = {};
+            let tasks = document.getElementsByClassName('task')
+            let i = 0
+            let ob = {}
             for (i = 0; i < tasks.length; i++) {
-                let k = tasks[i].getAttribute("task-app-id");
-                let v = tasks[i].getBoundingClientRect();
+                let k = tasks[i].getAttribute("task-process-id")
+                let v = tasks[i].getBoundingClientRect()
                 ob[k] = {
                     x: v.left + (v.width/2),
                     y: v.top + (v.height/2)
-                };
+                }
             }
-            return ob[this.id];
+            return ob[this.processId]
         },
+
         getFullScreenPosition: function() {
-            let d = document.getElementsByClassName('desktop')[0];
-            d = d.getBoundingClientRect();
+            let d = document.getElementsByClassName('desktop')[0]
+            d = d.getBoundingClientRect()
             return {
                 x: d.left + (d.width / 2),
                 y: d.top + (d.height / 2)
             }
         },
-
-        getNewZIndex: function() {
-           this.$store.commit('setMaxZIndex');
-           return this.getZIndex;
-        },
-        setCurrentTopWindow:function(id){
-            this.$store.commit('setCurrentTopWindowId', {appId: id});
-        }
+        iconImages: require.context('../assets/', true, /\.png$/)
     },
     computed: {
         getScreenWidth() {
-            return this.$store.getters.getScreenWidth;
+            return this.$store.getters.getScreenWidth
         },
         getScreenHeight() {
-            return this.$store.getters.getScreenHeight;
-        },
-        getZIndex() {
-            return this.$store.getters.getMaxZIndex;
-        },
-        getCurrentTopWindowId() {
-            return this.$store.getters.getCurrentTopWindowId;
-        },
-        getTemporaryWindowId() {
-            return this.$store.getters.getTemporaryWindowId;
+            return this.$store.getters.getScreenHeight
         }
-
     },
     watch: {
-        getCurrentTopWindowId: function (){
-            //console.log('watch id',this.id,'curtop',this.getCurrentTopWindowId);
-            if (this.getCurrentTopWindowId == this.id) {
-                this.isFocused = true;
-                this.$store.commit('setFocus', {appId: this.id, focused: true});
-                this.windowStyle.zIndex = this.getNewZIndex();
-
-                if ( this.isMinimized ) {
-                    this.unMinimizeWindow();
-                }
-
-            } else if ( this.nextFocusedWindowId == this.getCurrentTopWindowId ) {
-                this.nextFocusedWindowId = this.getTemporaryWindowId;
-            }
-        }
-    },
-    directives: {
-        'mousedown-outside': {
-            bind: function(el, binding, vNode) {
-
-                // Provided expression must evaluate to a function.
-                if (typeof binding.value !== 'function') {
-                    const compName = vNode.context.name;
-                    let warn = `[Vue-mousedown-outside:] provided expression '${binding.expression}' is not a function, but has to be`;
-                    if (compName) {
-                        warn += `Found in component '${compName}'`;
-                    }
-                    console.warn(warn);
-                }
-
-                // Define Handler and cache it on the element
-                const bubble = binding.modifiers.bubble;
-                const handler = (e) => {
-                    if (bubble || (!el.contains(e.target) && el !== e.target)) {
-                        binding.value(e);
-                    }
-                }
-                el.__vueClickOutside__ = handler;
-
-                // add Event Listeners
-                document.addEventListener('mousedown', handler);
-            },
-            unbind: function(el, binding) {
-
-                // Remove Event Listeners
-                document.removeEventListener('mousedown', el.__vueClickOutside__);
-                el.__vueClickOutside__ = null;
-            }
+        zIndex: function () {
+            this.windowStyle.zIndex = this.zIndex
+        },
+        minimized: function() {
+            this.minimized ? this.minimizeWindow() : this.unMinimizeWindow()
         }
     }
 }
@@ -560,10 +498,10 @@ export default {
     flex-direction: column;
     position: fixed;
     box-sizing:border-box;
-    width: 300px;
+    /* width: 300px;
     height: 200px;
     top: 120px;
-    left: 100px;
+    left: 100px; */
     animation: open-window 0.15s ease-out;
 }
 .maximize-window {
@@ -669,7 +607,9 @@ export default {
                 flex: none;
                 margin: 0 0 0 8px;
                 background-repeat: no-repeat;
+                /* background-size: cover; */
                 background-position: center center;
+                background-size: 16px 16px;
             }
             .maximize-window .title-bar-icon {
                 width: 16px;
@@ -781,6 +721,9 @@ export default {
             flex:none;
             background-color: white;
         }
+        .univ .title-bar-icon {
+            display: none
+        }
         .maximize-window.univ .title-bar {
             height:32px;
         }
@@ -794,7 +737,7 @@ export default {
                 width: 46px;
                 height: 31px;
                 flex: none;
-                background-image: url('../assets/images/window/minimize.png');
+                background-image: url('../assets/images/window/maximize.png');
                 background-repeat: no-repeat;
                 background-position: center center;
             }
@@ -815,7 +758,7 @@ export default {
                 width: 46px;
                 height: 31px;
                 flex: none;
-                background-image: url('../assets/images/window/maximize.png');
+                background-image: url('../assets/images/window/minimize.png');
                 background-repeat: no-repeat;
                 background-position: center center;
             }
@@ -861,13 +804,20 @@ export default {
             box-sizing:border-box;
             flex: auto;
         }
+        .iframe-cover {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            /* background-color: red;
+            opacity: 0.2; */
+        }
         .window-overlay{
             width: 100%;
             height: 100%;
             position: fixed;
             left:0;
             top:0;
-            background-color: red;
+            /* background-color: red; */
             opacity: 0.2;
             display: none;
             z-index: 1;
