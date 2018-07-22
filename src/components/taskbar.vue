@@ -25,7 +25,7 @@
         </div>
     </div>
 
-    <div class="task-bar-drag" @mousedown="dragStart">
+    <div class="task-bar-drag" @mousedown="dragStart" @touchstart="dragStart">
 
     </div>
     <div class="clock-area">
@@ -36,8 +36,6 @@
     <div id="notifybtn" class="notify-btn"></div>
     <div class="show-desktop"></div>
     <div class="taskbar-color">
-        <div class="taskbar-gaussian-bg">
-        </div>
     </div>
 </div>
 </template>
@@ -56,20 +54,28 @@ export default {
         setInterval(this.updateDateTime, 1000);
         window.addEventListener('mouseup', this.dragEnd);
         window.addEventListener('mousemove', this.drag);
+        window.addEventListener('touchend', this.dragEnd);
+        window.addEventListener('touchmove', this.drag);
+
     },
     beforeDestroy: function() {
         window.removeEventListener('mouseup', this.dragEnd);
         window.removeEventListener('mousemove', this.drag);
+        window.removeEventListener('touchend', this.dragEnd);
+        window.removeEventListener('touchmove', this.drag);
+
     },
     methods : {
         dragStart: function() {
             this.isDrag = true;
         },
-        drag : function (event) {
+        drag : function (e) {
             if(this.isDrag){
                 if (event.clientX != 0 && event.clientY != 0) {
+                    let clientX = (e.clientX) ? e.clientX : e.touches[0].clientX;
+                    let clientY = (e.clientY) ? e.clientY : e.touches[0].clientY;
                     this.$store.commit('setTaskbarDirection', {
-                        direction: this.getCardinalDirection(event.clientX, event.clientY)
+                        direction: this.getCardinalDirection(clientX, clientY)
                     });
                 }
             }
@@ -351,11 +357,6 @@ export default {
         z-index:-2;
         background-color:#000000;
         opacity: 0.84;
-    }
-    .taskbar-gaussian-bg {
-        width:100vw;
-        height:100vh;
-        z-index:-1;
     }
     .task-bottom .taskbar {
         height: 40px;

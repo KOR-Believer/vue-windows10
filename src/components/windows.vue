@@ -15,20 +15,24 @@
         <div
             class="border-nw"
             @mousedown="dragStart('nw-resize', $event)"
+            @touchstart="dragStart('nw-resize', $event)"
         ></div>
         <div
             class="border-n"
             @mousedown="dragStart('n-resize',  $event)"
+            @touchstart="dragStart('n-resize',  $event)"
         ></div>
         <div
             class="border-ne"
             @mousedown="dragStart('ne-resize', $event)"
+            @touchstart="dragStart('ne-resize', $event)"
         ></div>
     </div>
     <div class="window-border-middle">
         <div
             class="border-w"
             @mousedown="dragStart('w-resize',  $event)"
+            @touchstart="dragStart('w-resize',  $event)"
         ></div>
         <div class="window-frame">
             <div class="title-bar">
@@ -39,6 +43,7 @@
                 <div
                     class="window-title"
                     @mousedown="dragStart('title-bar', $event)"
+                    @touchstart="dragStart('title-bar', $event)"
                     @dblclick="maximizeWindow"
                 >
                     {{id}}
@@ -69,12 +74,12 @@
                 <div class="window-overlay" :style="{display: overlayDisplay, cursor: overlayCursor}"></div>
             </div>
         </div>
-        <div class="border-e" @mousedown="dragStart('e-resize', $event)" ></div>
+        <div class="border-e" @mousedown="dragStart('e-resize', $event)" @touchstart="dragStart('e-resize', $event)" ></div>
     </div>
     <div class="window-border-bottom">
-        <div class="border-sw" @mousedown="dragStart('sw-resize', $event)"></div>
-        <div class="border-s"  @mousedown="dragStart('s-resize',  $event)"></div>
-        <div class="border-se" @mousedown="dragStart('se-resize', $event)"></div>
+        <div class="border-sw" @mousedown="dragStart('sw-resize', $event)" @touchstart="dragStart('sw-resize', $event)"></div>
+        <div class="border-s"  @mousedown="dragStart('s-resize',  $event)" @touchstart="dragStart('s-resize',  $event)"></div>
+        <div class="border-se" @mousedown="dragStart('se-resize', $event)" @touchstart="dragStart('se-resize', $event)"></div>
     </div>
 </div>
 </template>
@@ -126,10 +131,15 @@ export default {
     mounted: function() {
         window.addEventListener('mouseup', this.dragEnd);
         window.addEventListener('mousemove', this.drag);
+        window.addEventListener('touchend',this.dragEnd);
+        window.addEventListener('touchmove',this.drag);
+
     },
     beforeDestroy: function() {
         window.removeEventListener('mouseup', this.dragEnd);
         window.removeEventListener('mousemove', this.drag);
+        window.removeEventListener('touchend',this.dragEnd);
+        window.removeEventListener('touchmove',this.drag);
     },
     methods: {
         outside: function() {
@@ -188,8 +198,10 @@ export default {
             this.isMaximized = !this.isMaximized;
         },
         dragStart: function(action, e) {
-            this.temporaryStyle.refMouseX = e.clientX;
-            this.temporaryStyle.refMouseY = e.clientY;
+            let clientX = (e.clientX) ? e.clientX : e.touches[0].clientX;
+            let clientY = (e.clientY) ? e.clientY : e.touches[0].clientY;
+            this.temporaryStyle.refMouseX = clientX;
+            this.temporaryStyle.refMouseY = clientY;
             this.windowsAction            = action;
             this.temporaryStyle.refWidth  = parseInt(this.windowStyle.width,  10);
             this.temporaryStyle.refHeight = parseInt(this.windowStyle.height, 10);
@@ -209,10 +221,13 @@ export default {
                 if (this.overlayDisplay == 'none') {
                     this.overlayDisplay = 'block';
                 }
-                let offsetX = e.clientX - this.temporaryStyle.refMouseX;
-                let offsetY = e.clientY - this.temporaryStyle.refMouseY;
+                let clientX = (e.clientX) ? e.clientX : e.touches[0].clientX;
+                let clientY = (e.clientY) ? e.clientY : e.touches[0].clientY;
+
+                let offsetX = clientX - this.temporaryStyle.refMouseX;
+                let offsetY = clientY - this.temporaryStyle.refMouseY;
                 let nWidth, nHeight;
-                if (e.clientX || e.clientY) {
+                if (clientX || clientY) {
                     switch (this.windowsAction) {
                         case "title-bar":
                             if (this.isMaximized) {
