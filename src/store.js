@@ -12,7 +12,7 @@ export const store = new Vuex.Store({
             || document.documentElement.clientHeight
             || document.body.clientHeight,
 
-        maxZIndexValue: 0,
+        maxZIndexValue: 10,
 
         currentTopWindowId: 0,
 

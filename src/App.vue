@@ -2,18 +2,13 @@
     <div id="wrap" :class="'task-'+direction">
         <div class="desktop">
             <notifybar></notifybar>
-            <div id="new-window1" style="background-color:blue; width:100px; height:100px;" @click="tryOpen(1)">APP 1</div>
-            <div id="new-window2" style="background-color:blue; width:100px; height:100px;" @click="tryOpen(2)">APP 2</div>
-            <div id="new-window3" style="background-color:blue; width:100px; height:100px;" @click="tryOpen(3)">APP 3</div>
-            <div id="new-window4" style="background-color:blue; width:100px; height:100px;" @click="tryOpen(4)">APP 4</div>
-
+            <icongrid :icon-list="mockicons"></icongrid>
             <windows
                 v-for="(openedWindow, index) in getAllTaskList"
                 :key="index"
                 :app-id="openedWindow.appId"
                 ref="windowComp"
             ></windows>
-
         </div>
         <taskbar></taskbar>
     </div>
@@ -23,20 +18,40 @@
 import notifybar from './components/notifybar.vue'
 import taskbar   from './components/taskbar.vue'
 import windows   from './components/windows.vue'
+import icongrid  from './components/icongrid.vue'
+
 
 export default {
     components: {
         'notifybar': notifybar,
         'taskbar': taskbar,
-        'windows': windows
+        'windows': windows,
+        'icongrid':icongrid
     },
     data: function() {
         return {
+            mockicons : [
+                {
+                    appId : 1,
+                    title: "title is title",
+                    iconImage: "/",
+                    iconSelected: false,
+                    iconFocused: false
+                },
+                {
+                    appId : 2,
+                    title: "title2 is title2",
+                    iconImage: "/",
+                    iconSelected: false,
+                    iconFocused: false
+                }
+            ]
         }
     },
     mounted: function() {
         this.$nextTick(function() {
             window.addEventListener('resize', this.resizeWindow);
+            //this.tryOpen(1);
         });
     },
     beforeDestroy: function() {
@@ -87,6 +102,8 @@ export default {
     margin: 0;
     padding: 0;
     border: 0;
+    min-height: 0;
+    min-width: 0;
     font-family: 'Segoe UI', 'malgun gothic';
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -95,13 +112,32 @@ export default {
     -ms-user-select: none;
     user-select: none;
 }
+*:focus {
+    outline: none
+}
 body {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-    background-image: url('./assets/images/desktop/bg_normal.jpg');
+    background: #FFF;
+    background-image: url('./assets/images/desktop/bg.jpg');
     background-size: cover;
     background-position: center;
+}
+.selection {
+    background: rgba(0, 102, 204, 0.2745);
+    border: 1px solid rgb(0, 120, 215);
+    z-index: 4;
+}
+.overlay{
+    filter: blur(25px);
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    z-index: 1100;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
 }
 </style>
 
@@ -114,7 +150,8 @@ body {
 .desktop {
     position: relative;
     display: flex;
-    flex:1;
+    flex:1 0 0;
+    /* margin-top:5px; */
     width:inherit;
     height:inherit;
     flex-direction: column;
