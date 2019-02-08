@@ -132,6 +132,7 @@
     }
     .icon.focused .app-title {
         -webkit-line-clamp: inherit;
+        word-break: initial;
         max-height: 10000px;
         z-index: 3;
     }

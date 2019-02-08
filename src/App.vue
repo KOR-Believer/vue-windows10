@@ -38,7 +38,7 @@ export default {
         return {
             mockicons : [
                 {
-                    title: "SOCC - Study Oriented Coding Club",
+                    title: "SOCC - Study\n Oriented Coding Club",
                     iconImage: "./images/icongrid/socc_character_256.png",
                      width:'980px',
                     height:'630px',
