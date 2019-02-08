@@ -169,6 +169,8 @@
                       2px 0 2px #000,
                       0 2px 2px #000;
         color: #fff;
+        white-space: pre-wrap;
+        word-break:break-all;
         word-wrap: break-word;
         line-height: 15px;
         letter-spacing: 0.01em;

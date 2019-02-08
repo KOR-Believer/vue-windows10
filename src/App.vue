@@ -71,7 +71,7 @@ export default {
                     }
                 },
                 {
-                    title: "명령 프롬프트",
+                    title: "명령\n프롬프트",
                     iconImage: "./images/icongrid/console.png",
                     width:'600px',
                     height:'400px',
