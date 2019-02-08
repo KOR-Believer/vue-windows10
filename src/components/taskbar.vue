@@ -11,16 +11,17 @@
     <div class="task-grid">
         <div
             class="task"
-            :task-app-id="openedWindow.appId"
-            :class="{'task-opened': true,'focused':openedWindow.focused}"
-            v-for="(openedWindow) in getSortedAllTaskList"
-            :key="openedWindow.appId"
-            ref="'task'+openedWindow.appId"
-            @click="tryOpen(openedWindow.appId)"
+            :task-process-id="process.processId"
+            :class="{
+                'task-opened': process.hasOwnProperty('processId'),
+                'focused':process.focused
+            }"
+            v-for="(process) in getSortedAllTaskList"
+            :key="process.processId"
+            @click="tryOpen(process)"
             @mouseover.once=";"
         >
-        id:
-        {{openedWindow.appId}}
+        <img :src="iconImages(process.iconImage)" style="position:absolute; top:0; left:0; right:0; bottom:0; width:24px; height:24px; margin:auto;"/>
         <hr>
         </div>
     </div>
@@ -33,7 +34,7 @@
         <div v-text="currentDay"></div>
         <div v-text="currentDate"></div>
     </div>
-    <div id="notifybtn" class="notify-btn"></div>
+    <div class="notify-btn"></div>
     <div class="show-desktop"></div>
     <div class="taskbar-color">
     </div>
@@ -82,7 +83,6 @@ export default {
         },
         dragEnd: function() {
             this.isDrag = false;
-            //this.getTaskPosition();
         },
         updateDateTime () {
             let nowDate     = new Date();
@@ -134,30 +134,25 @@ export default {
                 }[direction]
             }
         },
-        tryOpen: function(appId) {
-            if( this.$parent.getTaskByAppId(appId) ) {
-                this.$parent.$refs.windowComp.forEach(element => {
-                    if (element.id == appId) {
-                        element.focused = true;
-                        element.tryOpen();
-                        return;
+        tryOpen: function(app) {
+            if (app.hasOwnProperty('processId')) {
+                if (app.minimized) {
+                    this.$store.commit('unMinimize', app.processId)
+                } else {
+                    let maxZValue = Math.max.apply(Math, this.$store.getters.getAppList.map(
+                        process => process.zIndex
+                    ))
+                    if (app.zIndex == maxZValue) {
+                        this.$store.commit('minimize', app.processId)
+                    } else {
+                        this.$store.commit('setFocus', {processId:app.processId, focused: true})
                     }
-                });
+                }
             } else {
-                this.$parent.addTask(appId);
+
             }
         },
-
-        getWindowComp: function(appId) {
-            this.getParentWindowCompRefs.forEach(windowComp => {
-                if(windowComp.appId == appId) {
-
-                }
-            });
-        },
-        getTaskPosition: function() {
-
-        }
+        iconImages: require.context('../assets/', true, /\.png$/)
 
     },
     computed: {
@@ -168,14 +163,11 @@ export default {
             return this.$store.getters.getScreenHeight;
         },
         getSortedAllTaskList() {
-            let o = Object.values(this.$store.getters.getAllTaskList);
+            let o = Object.values(this.$store.getters.getAppList);
             o.sort(function(a,b){
-                return a.index - b.index
+                return a.processId - b.processId
             })
             return o;
-        },
-        getParentWindowCompRefs() {
-            return this.$parent.$refs.windowComp;
         }
     }
 }
