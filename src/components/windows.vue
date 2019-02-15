@@ -69,7 +69,7 @@
             <div class="main-panel">
                 <template v-if="mode=='iframe'">
                     <spinning-loader v-show="!loaded"></spinning-loader>
-                    <iframe :src="extra.src" class="iframe-inner" @load="loaded=true"></iframe>
+                    <iframe v-show="loaded" :src="extra.src" class="iframe-inner" @load="loaded=true"></iframe>
                     <div class="iframe-cover" v-show="!focused"></div>
                 </template>
                 <template  v-else>
