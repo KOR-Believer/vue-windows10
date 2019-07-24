@@ -32,7 +32,7 @@ export default {
         'notifybar': notifybar,
         'taskbar': taskbar,
         'windows': windows,
-        'icongrid':icongrid
+        'icongrid': icongrid
     },
     data: function() {
         return {

@@ -541,19 +541,19 @@ export default {
     flex-direction: row;
 }
     .border-nw {
-        cursor: nw-resize;
+        cursor: nwse-resize;
         flex: none;
         width: 8px;
         height: 100%;
     }
     .border-n {
-        cursor: n-resize;
+        cursor: ns-resize;
         width: auto;
         height: 100%;
         flex: auto;
     }
     .border-ne {
-        cursor: ne-resize;
+        cursor: nesw-resize;
         flex: none;
         width: 8px;
         height: 100%;
@@ -567,7 +567,7 @@ export default {
     flex-direction: row;
 }
     .border-w {
-        cursor: w-resize;
+        cursor: ew-resize;
         flex: none;
         width: 8px;
         height: auto;
@@ -823,7 +823,7 @@ export default {
             z-index: 1;
         }
     .border-e {
-        cursor: e-resize;
+        cursor: ew-resize;
         flex: none;
         width: 8px;
         height: auto;
@@ -845,19 +845,19 @@ export default {
     flex-direction: row;
 }
     .border-sw {
-        cursor: sw-resize;
+        cursor: nesw-resize;
         flex: none;
         width: 8px;
         height: 100%;
     }
     .border-s {
-        cursor: s-resize;
+        cursor: ns-resize;
         width: auto;
         height: 100%;
         flex: auto;
     }
     .border-se {
-        cursor: se-resize;
+        cursor: nwse-resize;
         flex: none;
         width: 8px;
         height: 100%;
