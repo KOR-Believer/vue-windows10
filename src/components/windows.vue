@@ -91,7 +91,7 @@
 </template>
 
 <script>
-import velocity from 'velocity-animate'
+import Velocity from 'velocity-animate'
 import spinningLoader  from './spinningLoader.vue'
 export default {
     props: [
@@ -327,7 +327,7 @@ export default {
                 }
             }
         },
-        dragEnd: function(e) {
+        dragEnd: function() {
             this.isDrag         = false
             this.overlayDisplay = 'none'
             this.overlayCursor  = 'default'
@@ -339,7 +339,7 @@ export default {
             window.removeEventListener('touchend',this.dragEnd)
             window.removeEventListener('touchmove',this.drag)
         },
-        close: function(e) {
+        close: function() {
             this.invisible = true
             setTimeout(() => {
                 this.$store.commit('deleteApp', this.processId)
@@ -581,11 +581,19 @@ export default {
         flex: 1 1 auto;
         display: flex;
         flex-direction: column;
-        background-color: white;
+        /* background-color: white; */
+
         -webkit-box-shadow: 3px 3px 20px 2px rgba(0,0,0,0.3);
         -moz-box-shadow: 3px 3px 20px 2px rgba(0,0,0,0.3);
         box-shadow: 3px 3px 20px 2px rgba(0,0,0,0.3);
     }
+    .show-desktop .window-frame{
+        border: 1px solid rgba(0,0,0,0);
+    }
+    .show-desktop .window-frame > div{
+        opacity: 0;
+    }
+
     .focused-window .window-frame {
         border: 1px solid #807ed6;
     }

@@ -1,5 +1,5 @@
 const Selected = {
-    install: function (Vue, options) {
+    install: function (Vue) {
         Vue.directive('selected', {
             bind: function (el, binding, vNode) {
 
@@ -26,7 +26,7 @@ const Selected = {
                     }
                 }
 
-                const onTabMove = (e) => {
+                const onTabMove = () => {
                     let icon = el
                     let selection = binding.value.$refs.selection
                     if (intersects(icon, selection)) {
@@ -36,14 +36,14 @@ const Selected = {
                     }
                 }
 
-                const onTabEnd = (e) => {
+                const onTabEnd = () => {
                     document.removeEventListener('mousemove',el.__vueOnTabMove__)
                     el.__vueOnTabMove__ = null
                     document.removeEventListener('mouseup',el.__vueOnTabEnd__)
                     el.__vueOnTabEnd__ = null
                 }
 
-                const onTabStart = (e) => {
+                const onTabStart = () => {
                     el.__vueOnTabMove__ = onTabMove
                     document.addEventListener('mousemove',el.__vueOnTabMove__)
                     el.__vueOnTabEnd__ = onTabEnd

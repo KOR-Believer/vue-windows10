@@ -148,6 +148,7 @@ export default {
                         this.$store.commit('setFocus', {processId:app.processId, focused: true})
                     }
                 }
+            // eslint-disable-next-line
             } else {
 
             }

@@ -2,7 +2,7 @@ import 'babel-polyfill';
 import isOutside from './customPlugins/isOutside'
 import Selected from './customPlugins/selected'
 import Vue from 'vue'
-import App from './app.vue'
+import App from './App.vue'
 import { store } from './store'
 
 Vue.use(isOutside)

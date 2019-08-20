@@ -55,7 +55,7 @@ export const store = new Vuex.Store({
         }
     },
     mutations: {
-        screenRecalculation: function (state, payload) {
+        screenRecalculation: function (state) {
             state.screenWidth = window.innerWidth
                 || document.documentElement.clientWidth
                 || document.body.clientWidth
@@ -64,10 +64,10 @@ export const store = new Vuex.Store({
                 || document.documentElement.clientHeight
                 || document.body.clientHeight
         },
-        incrementZIndex: function (state, payload) {
+        incrementZIndex: function (state) {
             state.maxZIndexValue++
         },
-        incrementProcessCount: function (state, payload) {
+        incrementProcessCount: function (state) {
             state.processCount++
         },
         setTaskbarDirection: function (state, payload) {

@@ -73,7 +73,7 @@
             click: function () {
                 // this.iconSelected = true
             },
-            doubleClick: function (params) {
+            doubleClick: function () {
                 this.$store.commit('addApp', this.$options.propsData)
                 this.iconSelected = false
                 this.iconFocused = false

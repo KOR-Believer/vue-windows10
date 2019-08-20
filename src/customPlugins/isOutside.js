@@ -10,6 +10,7 @@ const isOutside = {
                     if (compName) {
                         warn += `Found in component '${compName}'`;
                     }
+                    // eslint-disable-next-line
                     console.warn(warn);
                 }
 
@@ -43,6 +44,7 @@ const isOutside = {
                     if (compName) {
                         warn += `Found in component '${compName}'`;
                     }
+                    // eslint-disable-next-line
                     console.warn(warn);
                 }
 
@@ -76,6 +78,7 @@ const isOutside = {
                     if (compName) {
                         warn += `Found in component '${compName}'`;
                     }
+                    // eslint-disable-next-line
                     console.warn(warn);
                 }
 
