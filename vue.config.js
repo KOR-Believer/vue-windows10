@@ -1,6 +1,6 @@
 module.exports = {
   publicPath: process.env.NODE_ENV === 'production'
-    ? '/' // ? '/production-sub-path/'
+    ? '/vue-windows10/'
     : '/',
-    outputDir: 'docs'
+  outputDir: 'docs'
 }
