@@ -1,5 +1,5 @@
 <template>
-<div class="taskbar" data-component="taskbar">
+<div class="taskbar">
     <div class="start-btn"></div>
     <div class="search-bar">
         <div class="search-icon"></div>
@@ -21,7 +21,10 @@
             @click="tryOpen(process)"
             @mouseover.once=";"
         >
-        <img :src="iconImages(process.iconImage)" style="position:absolute; top:0; left:0; right:0; bottom:0; width:24px; height:24px; margin:auto;"/>
+        <img
+            :src="iconImages(process.iconImage)"
+            style="position:absolute; top:0; left:0; right:0; bottom:0; width:24px; height:24px; margin:auto;"
+        />
         <hr>
         </div>
     </div>
@@ -36,8 +39,9 @@
     </div>
     <div class="notify-btn"></div>
     <div class="show-desktop"></div>
-    <div class="taskbar-color">
-    </div>
+    <div class="taskbar-color"></div>
+    <!-- <div style="min-width:200px; max-width: 700px; width:100%; height: 700px; background: red;position: absolute; bottom:40px;background-color:#000000; opacity: 0.84;"></div> -->
+
 </div>
 </template>
 

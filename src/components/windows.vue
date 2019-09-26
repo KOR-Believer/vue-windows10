@@ -581,7 +581,7 @@ export default {
         flex: 1 1 auto;
         display: flex;
         flex-direction: column;
-        /* background-color: white; */
+        background-color: white;
 
         -webkit-box-shadow: 3px 3px 20px 2px rgba(0,0,0,0.3);
         -moz-box-shadow: 3px 3px 20px 2px rgba(0,0,0,0.3);
