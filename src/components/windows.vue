@@ -111,7 +111,7 @@ export default {
     data () {
         return {
             id: this.processId,
-            minWidth : 190,
+            minWidth: 190,
             minHeight: 46,
             loaded: false,
             isDrag: false,
@@ -132,15 +132,15 @@ export default {
             temporaryStyle: {
                 refMouseX: 0,
                 refMouseY: 0,
-                refWidth : 0,
+                refWidth: 0,
                 refHeight: 0,
-                refLeft  : 0,
-                refTop   : 0
+                refLeft: 0,
+                refTop: 0
             },
-            minimizeButtonOut:'',
-            maximizeButtonOut:'',
-            closeButtonOut:'',
-            mode:'',
+            minimizeButtonOut: '',
+            maximizeButtonOut: '',
+            closeButtonOut: '',
+            mode: '',
             extra: {
             }
         }
@@ -154,16 +154,16 @@ export default {
         this.windowStyle.width = this.width
     },
     mounted: function() {
-        this.windowStyle.top  = ((this.getScreenHeight-parseInt(this.windowStyle.height,10))/2)+'px'
+        this.windowStyle.top = ((this.getScreenHeight-parseInt(this.windowStyle.height,10))/2)+'px'
         this.windowStyle.left = ((this.getScreenWidth-parseInt(this.windowStyle.width,10))/2)+'px'
-        if(this.minimized) this.minimizeWindow()
+        if (this.minimized) this.minimizeWindow()
 
     },
     beforeDestroy: function() {
         window.removeEventListener('mouseup', this.dragEnd)
         window.removeEventListener('mousemove', this.drag)
-        window.removeEventListener('touchend',this.dragEnd)
-        window.removeEventListener('touchmove',this.drag)
+        window.removeEventListener('touchend', this.dragEnd)
+        window.removeEventListener('touchmove', this.drag)
     },
     methods: {
         inside: function() {
@@ -203,8 +203,8 @@ export default {
             this.chromeIgnore = true
             window.addEventListener('mouseup', this.dragEnd)
             window.addEventListener('mousemove', this.drag)
-            window.addEventListener('touchend',this.dragEnd)
-            window.addEventListener('touchmove',this.drag)
+            window.addEventListener('touchend', this.dragEnd)
+            window.addEventListener('touchmove', this.drag)
         },
         drag : function(e) {
 
@@ -370,7 +370,7 @@ export default {
                         translateX: posX+'px',
                         translateY: posY+'px',
                         opacity: -0.4,
-                        scale: 0.0
+                        scale: 0.00001
                     },
                     {
                         duration: 200,
@@ -399,7 +399,7 @@ export default {
             let posX = icon.x - windowX
             let posY = icon.y - windowY
 
-            if( this.$el ) {
+            if ( this.$el ) {
                 let el = this.$el
                 Velocity(el, 'stop')
                 this.windowStyle.transform = "none"
@@ -409,7 +409,7 @@ export default {
                         translateX: posX+'px',
                         translateY: posY+'px',
                         opacity: -0.4,
-                        scale:0.0
+                        scale: 0.0
                     },
                     {
                         duration: 0,
@@ -421,7 +421,7 @@ export default {
                                     translateX: '0px',
                                     translateY: '0px',
                                     opacity: 1,
-                                    scale:1
+                                    scale: 1
                                 },
                                 {
                                     duration: 200,
