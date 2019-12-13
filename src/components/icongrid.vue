@@ -1,7 +1,8 @@
 <template>
     <div
         class="grid-body"
-        @mousedown="mousedown"
+        @mousedown="mousedown($event)"
+        @touchstart="mousedown($event)"
         @click="click"
         @keydown.enter="enter"
         tabindex="0"
@@ -23,7 +24,12 @@
                 ></app-icon>
             </li>
         </ul>
-        <div class="selection" ref="selection" v-show="selectionDisplay" :style="selectionArea"></div>
+        <div
+            class="selection"
+            ref="selection"
+            v-show="selectionDisplay"
+            :style="selectionArea"
+        ></div>
     </div>
 </template>
 <script>
@@ -63,6 +69,7 @@
 
             },
             outside: function () {
+
             },
             click: function () {
 
@@ -73,38 +80,41 @@
                 this.lastY  = (touch || evt).clientY
                 this.selectionDisplay = true
                 window.addEventListener('mousemove', this.mousemove)
+                window.addEventListener('touchmove', this.mousemove)
                 window.addEventListener('mouseup', this.mouseup)
+                window.addEventListener('touchend', this.mouseup)
 
             },
             mousemove: function(evt) {
                if(this.lastX || this.lastY) {
-                   const { /*abs,*/ max, min } = Math
-                   const brect = this.$el.getBoundingClientRect()
-                   const touch = evt.touches && evt.touches[0]
-                   let x2 = (touch || evt).clientX
-                   let y2 = (touch || evt).clientY
+                    const { /*abs,*/ max, min } = Math
+                    const brect = this.$el.getBoundingClientRect()
+                    const touch = evt.touches && evt.touches[0]
+                    let x2 = (touch || evt).clientX
+                    let y2 = (touch || evt).clientY
+                    //cliping
+                    if (x2 < brect.left) x2 = brect.left
+                    if (y2 < brect.top) y2 = brect.top
+                    if (x2 > brect.left + brect.width) x2 = brect.left + brect.width
+                    if (y2 > brect.top + brect.height) y2 = brect.top + brect.height
 
-                   //cliping
-                   if (x2 < brect.left) x2 = brect.left
-                   if (y2 < brect.top) y2 = brect.top
-                   if (x2 > brect.left + brect.width) x2 = brect.left + brect.width
-                   if (y2 > brect.top + brect.height) y2 = brect.top + brect.height
+                    const x3 = min(this.lastX, x2)
+                    const y3 = min(this.lastY, y2)
+                    const x4 = max(this.lastX, x2)
+                    const y4 = max(this.lastY, y2)
 
-                   const x3 = min(this.lastX, x2)
-                   const y3 = min(this.lastY, y2)
-                   const x4 = max(this.lastX, x2)
-                   const y4 = max(this.lastY, y2)
-
-                   this.selectionArea.top = y3 + "px"
-                   this.selectionArea.left = x3 + "px"
-                   this.selectionArea.width = (x4 - x3) + "px"
-                   this.selectionArea.height = (y4 - y3) + "px"
+                    this.selectionArea.top = y3 + "px"
+                    this.selectionArea.left = x3 + "px"
+                    this.selectionArea.width = (x4 - x3) + "px"
+                    this.selectionArea.height = (y4 - y3) + "px"
                 }
             },
             mouseup: function () {
-                this.selectionDisplay = false;
-                window.removeEventListener('mousemove', this.mousemove);
-                window.removeEventListener('mouseup', this.mouseup);
+                this.selectionDisplay = false
+                window.removeEventListener('mousemove', this.mousemove)
+                window.removeEventListener('touchmove', this.mousemove)
+                window.removeEventListener('mouseup', this.mouseup)
+                window.removeEventListener('touchend', this.mouseup)
                 this.selectionArea.width = 0
                 this.selectionArea.height = 0
                 this.selectionArea.top = 0

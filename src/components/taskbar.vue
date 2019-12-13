@@ -204,8 +204,8 @@ export default {
     }
     .taskbar {
         z-index: 2147483647;
-        flex:none;
-        color:white;
+        flex: none;
+        color: white;
         position: relative;
         display: flex;
     }
@@ -221,31 +221,31 @@ export default {
         background-image: url('../assets/images/taskbar/start_op0_hover.png');
     }
     .search-bar {
-        border-top:1px solid rgb(187,187,187);
-        border-bottom:1px solid rgba(0,0,0,0);
+        border-top: 1px solid rgb(187,187,187);
+        border-bottom: 1px solid rgba(0,0,0,0);
         background-color: rgb(242,242,242);
         height: 100%;
         width: 344px;
-        box-sizing:border-box;
+        box-sizing: border-box;
         color: rgb(43,43,43);
         font-size: 15px;
         flex:none;
         letter-spacing: 0.005em;
     }
     .search-icon {
-        width:40px;
-        height:100%;
-        float:left;
+        width: 40px;
+        height: 100%;
+        float: left;
         background-image: url('../assets/images/taskbar/search.png');
         background-position: center center;
         background-repeat: no-repeat;
     }
     .search-text {
-        width:304px;
-        height:100%;
-        display:flex;
-        float:left;
-        justify-content:center;
+        width: 304px;
+        height: 100%;
+        display: flex;
+        float: left;
+        justify-content: center;
         flex-direction: column;
     }
     .search-bar:hover {
@@ -253,7 +253,7 @@ export default {
         cursor: text;
     }
     .search-btn {
-        flex:none;
+        flex: none;
         background-image: url('../assets/images/taskbar/search_w.png');
         background-position: center center;
         background-repeat: no-repeat;
@@ -263,7 +263,7 @@ export default {
         background-color: rgba(255,255,255,0.1);
     }
     .task-view {
-        flex:none;
+        flex: none;
         animation: button_out .2s;
         background-image: url('../assets/images/taskbar/timeline.png');
         background-position: center center;
@@ -276,7 +276,7 @@ export default {
         background-repeat: no-repeat;
     }
     .task-grid {
-        display:flex;
+        display: flex;
         flex-wrap: wrap;
         flex-direction: inherit;
         flex: none;
@@ -284,8 +284,8 @@ export default {
     }
     .task {
         position: relative;
-        text-align:center;
-        flex:none;
+        text-align: center;
+        flex: none;
         animation: button_out .2s;
     }
     .task:hover {
@@ -315,7 +315,7 @@ export default {
         flex-shrink: 1;
     }
     .notify-btn {
-        flex:none;
+        flex: none;
         animation: button_out .2s;
         background-image: url('../assets/images/taskbar/notify.png');
         background-position: center center;
@@ -325,40 +325,40 @@ export default {
         background-color: rgba(255,255,255,0.1);
     }
     .clock-area {
-        flex:none;
+        flex: none;
         animation: button_out .2s;
     }
     .clock-area div {
         /* font-size:0.788em; */
-        font-size:0.8em;
+        font-size: 0.8em;
 
-        color:#dddddd;
-        text-align:center;
+        color: #dddddd;
+        text-align: center;
     }
     .clock-area:hover {
         background-color: rgba(255,255,255,0.1);
     }
     .show-desktop{
-        flex:none;
+        flex: none;
         animation: button_out .2s;
     }
     .show-desktop:hover {
         background-color: rgba(255,255,255,0.1);
     }
     .taskbar-color {
-        width:100%;
-        height:100%;
-        position:absolute;
+        width: 100%;
+        height: 100%;
+        position: absolute;
         top: 0;
         left: 0;
-        z-index:-2;
-        background-color:#000000;
+        z-index: -2;
+        background-color :#000000;
         opacity: 0.84;
     }
     .task-bottom .taskbar {
         height: 40px;
         width: 100vw;
-        flex-direction : row;
+        flex-direction: row;
     }
     .task-bottom .start-btn{
         height: 100%;
@@ -374,7 +374,7 @@ export default {
     }
     .task-bottom .task-opened hr{
         height: 2px;
-        left:8.335%;
+        left: 8.335%;
         bottom: 0;
         width: 83.33%;
     }
@@ -399,8 +399,8 @@ export default {
     .task-bottom .clock-area {
         height: 100%;
         width: 80px;
-        padding-top:1px;
-        box-sizing:border-box;
+        padding-top: 1px;
+        box-sizing: border-box;
         line-height: 18px;
     }
     .task-bottom .clock-area div:nth-of-type(2) {
@@ -416,7 +416,7 @@ export default {
         height: 40px;
         width: 100vw;
         top: 0;
-        flex-direction : row;
+        flex-direction: row;
     }
     .task-top .start-btn{
         height: 100%;
@@ -437,7 +437,7 @@ export default {
     }
     .task-top .task-opened hr{
         height: 2px;
-        left:8.335%;
+        left: 8.335%;
         top: 0;
         width: 83.33%;
     }
@@ -461,8 +461,8 @@ export default {
     .task-top .clock-area {
         height: 100%;
         width: 80px;
-        padding-top:1px;
-        box-sizing:border-box;
+        padding-top: 1px;
+        box-sizing: border-box;
         line-height: 18px;
     }
     .task-top .clock-area div:nth-of-type(2) {
@@ -479,7 +479,7 @@ export default {
         width: 66px;
         min-width: 62px;
         left: 0;
-        flex-direction : column;
+        flex-direction: column;
     }
     .task-left .start-btn{
         height: 40px;
@@ -500,7 +500,7 @@ export default {
     }
     .task-left .task-opened hr{
         width: 2px;
-        left:0;
+        left: 0;
         top: 8.335%;
         height: 83.33%;
     }
@@ -515,7 +515,7 @@ export default {
     .task-left .task-view{
         height: 40px;
         width: 100%;
-        margin-bottom:2px;
+        margin-bottom: 2px;
     }
     .task-left .notify-btn{
         height: 32px;
@@ -538,7 +538,7 @@ export default {
         width: 66px;
         min-width: 62px;
         right: 0;
-        flex-direction : column;
+        flex-direction: column;
     }
     .task-right .start-btn{
         height: 40px;
@@ -559,7 +559,7 @@ export default {
     }
     .task-right .task-opened hr{
         width: 2px;
-        right:0;
+        right: 0;
         top: 8.335%;
         height: 83.33%;
     }
@@ -574,7 +574,7 @@ export default {
     .task-right .task-view{
         height: 40px;
         width: 100%;
-        margin-bottom:2px;
+        margin-bottom: 2px;
     }
     .task-right .notify-btn{
         height: 32px;

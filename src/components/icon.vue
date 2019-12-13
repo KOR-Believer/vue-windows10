@@ -22,7 +22,7 @@
             'iconImage',
             'argv',
             'width',
-            'height'
+            'height',
         ],
         data() {
             return {
@@ -30,23 +30,22 @@
                 'iconFocused': false,
                 'startX': 0,
                 'startY': 0,
-                'diffResult': false
+                'diffResult': false,
             }
         },
         mounted: function () {
-            window.addEventListener('mousedown', this.startAt);
-            window.addEventListener('touchstart', this.startAt);
-            window.addEventListener('mouseup', this.diffXY);
-            window.addEventListener('touchend', this.diffXY);
+            window.addEventListener('mousedown', this.startAt)
+            window.addEventListener('touchstart', this.startAt)
+            window.addEventListener('mouseup', this.diffXY)
+            window.addEventListener('touchend', this.diffXY)
         },
         beforeDestroy: function () {
-            window.removeEventListener('mousedown', this.startAt);
-            window.removeEventListener('mouseup', this.diffXY);
-            window.removeEventListener('touchstart', this.startAt);
-            window.removeEventListener('touchend', this.diffXY);
+            window.removeEventListener('mousedown', this.startAt)
+            window.removeEventListener('mouseup', this.diffXY)
+            window.removeEventListener('touchstart', this.startAt)
+            window.removeEventListener('touchend', this.diffXY)
         },
         methods: {
-
             execute: function () {
 
             },
@@ -55,8 +54,8 @@
                 this.startY = ('clientY' in e) ? e.clientY : e.touches[0].clientY
             },
             diffXY: function (e) {
-                let nowX = ('clientX' in e) ? e.clientX : e.touches[0].clientX
-                let nowY = ('clientY' in e) ? e.clientY : e.touches[0].clientY
+                let nowX = ('clientX' in e) ? e.clientX : e.changedTouches[0].clientX
+                let nowY = ('clientY' in e) ? e.clientY : e.changedTouches[0].clientY
                 this.diffResult = (this.startX == nowX && this.startY == nowY)
             },
 

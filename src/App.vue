@@ -22,11 +22,11 @@
 </template>
 
 <script>
-import notifybar from './components/notifybar.vue'
-import taskbar   from './components/taskbar.vue'
-import windows   from './components/windows.vue'
-import icongrid  from './components/icongrid.vue'
-
+import notifybar  from './components/notifybar.vue'
+import taskbar    from './components/taskbar.vue'
+import windows    from './components/windows.vue'
+import icongrid   from './components/icongrid.vue'
+import screenfull from 'screenfull'
 export default {
     components: {
         'notifybar': notifybar,
@@ -89,6 +89,9 @@ export default {
     mounted: function() {
         this.$nextTick(function() {
             window.addEventListener('resize', this.resizeWindow);
+            if (screenfull.isEnabled) {
+                screenfull.request();
+            }
         });
     },
     beforeDestroy: function() {
