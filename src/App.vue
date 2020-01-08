@@ -56,7 +56,7 @@ export default {
                     argv: {
                         appId: 1,
                         mode: 'iframe',
-                        src: 'https://cors.io?https://m.naver.com'
+                        src: 'https://believer-cors-proxy.herokuapp.com/?https://m.naver.com'
                     }
                 },
                 {
