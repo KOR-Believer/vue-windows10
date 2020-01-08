@@ -208,6 +208,7 @@ export default {
         color: white;
         position: relative;
         display: flex;
+        backdrop-filter: blur(25px);
     }
     .start-btn {
         flex:none;
@@ -353,7 +354,7 @@ export default {
         left: 0;
         z-index: -2;
         background-color :#000000;
-        opacity: 0.84;
+        opacity: 0.65;
     }
     .task-bottom .taskbar {
         height: 40px;
