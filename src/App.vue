@@ -48,15 +48,48 @@ export default {
                         src: 'https://socc-io.github.io/home'
                     }
                 },
-                {
-                    title: "네이버",
-                    iconImage: "./images/icongrid/naver.png",
-                    width:'400px',
-                    height:'700px',
+                // {
+                //     title: "네이버",
+                //     iconImage: "./images/icongrid/naver.png",
+                //     width:'400px',
+                //     height:'700px',
+                //     argv: {
+                //         appId: 1,
+                //         mode: 'iframe',
+                //         src: 'https://believer-cors-proxy.herokuapp.com/?https://m.naver.com'
+                //     }
+                // },
+                // {
+                //     title: "명령\n프롬프트",
+                //     iconImage: "./images/icongrid/console.png",
+                //     width:'600px',
+                //     height:'400px',
+                //     argv: {
+                //         appId: 1,
+                //         mode: 'iframe',
+                //         src: 'https://rocky-basin-3981.herokuapp.com/app/cmd'
+                //     }
+                // }
+                 {
+                    title: "브랜디",
+                    iconImage: "./images/icongrid/brandi.png",
+                    width:'480px',
+                    height:'900px',
                     argv: {
                         appId: 1,
                         mode: 'iframe',
-                        src: 'https://believer-cors-proxy.herokuapp.com/?https://m.naver.com'
+                        src: 'https://www.brandi.co.kr/'
+                    }
+                },
+                 {
+                    title: "하이버",
+                    iconImage: "./images/icongrid/hiver.png",
+                    width:'480px',
+                    height:'900px',
+                    argv: {
+                        appId: 1,
+                        mode: 'iframe',
+                        src: 'https://www.hiver.co.kr/'
                     }
                 },
                 {
@@ -70,19 +103,6 @@ export default {
                         src: 'https://opentutorials.org/'
                     }
                 },
-                {
-                    title: "명령\n프롬프트",
-                    iconImage: "./images/icongrid/console.png",
-                    width:'600px',
-                    height:'400px',
-                    argv: {
-                        appId: 1,
-                        mode: 'iframe',
-                        src: 'https://rocky-basin-3981.herokuapp.com/app/cmd'
-                    }
-                }
-
-
             ]
         }
     },
