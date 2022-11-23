@@ -1,4 +1,3 @@
-import 'babel-polyfill';
 import isOutside from './customPlugins/isOutside'
 import Selected from './customPlugins/selected'
 import Vue from 'vue'
