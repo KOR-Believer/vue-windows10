@@ -565,6 +565,7 @@ export default {
     }
     .maximize-window .window-frame{
         border: 0 !important;
+        border-radius: 0;
     }
 
     .invisible {
@@ -622,6 +623,8 @@ export default {
             display: flex;
             flex-direction: column;
             background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
 
             -webkit-box-shadow: 3px 3px 20px 2px rgba(0,0,0,0.3);
             -moz-box-shadow: 3px 3px 20px 2px rgba(0,0,0,0.3);

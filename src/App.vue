@@ -103,6 +103,18 @@ export default {
                         src: 'https://opentutorials.org/'
                     }
                 },
+
+                {
+                    title: "Visual Studio Code",
+                    iconImage: "./images/icongrid/vscode.png",
+                    width:'1098px',
+                    height:'680px',
+                    argv: {
+                        appId: 1,
+                        mode: 'iframe',
+                        src: 'https://github1s.com/KOR-Believer/vue-windows10'
+                    }
+                },
             ]
         }
     },

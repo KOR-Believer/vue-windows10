@@ -110,9 +110,12 @@
 
     .icon:hover::after {
         pointer-events: all;
-        background: rgba(151, 203, 239, 0.192156862745098);
-        border: 1px solid rgba(0, 0, 0, 0);
-       box-shadow: inset 0px 0px 0px 1px rgba(247, 235, 250, 0.396078431372549);
+        /* background: rgba(151, 203, 239, 0.192156862745098); */
+        background: rgba(228,228,228,0.35);
+        border: 1px solid rgba(205,205,205,0.38);
+        border-radius: 3px;
+        /* border: 1px solid rgba(0, 0, 0, 0); */
+        /* box-shadow: inset 0px 0px 0px 1px rgba(247, 235, 250, 0.396078431372549); */
     }
 
     .icon.selected {
@@ -122,9 +125,12 @@
 
     .icon.selected::after {
         pointer-events: all;
-        background: rgba(153, 200, 240, 0.384);
-        border: 1px solid rgba(0, 0, 0, 0);
-        box-shadow: inset 0px 0px 0px 1px rgba(254, 254, 252, 0.25);
+        /* background: rgba(153, 200, 240, 0.384); */
+        background: rgba(228,228,228,0.35);
+        border: 1px solid rgba(205,205,205,0.38);
+        border-radius: 3px;
+        /* border: 1px solid rgba(0, 0, 0, 0); */
+        /* box-shadow: inset 0px 0px 0px 1px rgba(254, 254, 252, 0.25); */
     }
     .icon.focused {
         z-index:2;
